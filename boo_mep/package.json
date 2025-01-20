@@ -1,0 +1,84 @@
+{
+  "name": "boo_mep",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": ".",
+  "main": "main.js",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "cra-template": "1.2.0",
+    "electron-is-dev": "^3.0.1",
+    "express": "^4.21.2",
+    "jwt-decode": "^4.0.0",
+    "path": "^0.12.7",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.2",
+    "react-scripts": "5.0.1",
+    "sweetalert2": "^11.15.10",
+    "universal-cookie": "^7.2.2",
+    "zustand": "^5.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron:build": "electron-builder build --win --publish never"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "EduPlan",
+    "productName": "EduPlan",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "Servidor/**/*",
+      "node_modules/**/*",
+      "dist/**/*",
+      "package.json",
+      "main.js"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "extraResources": [
+      {
+        "from": "Servidor/",
+        "to": "Servidor/",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

@@ -1,0 +1,110 @@
+.instituciones-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.main-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.description {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.instituciones-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.button-institucion {
+    background-color: #4caf50;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    padding: 15px;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+.button-institucion:hover {
+    background-color: #45a049;
+}
+
+/*CSS del DIALOGO*/
+
+/* Fondo blanco para el diálogo */
+.custom-dialog .p-dialog-content {
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+}
+
+/* Desenfoque del fondo */
+.p-dialog-mask {
+    backdrop-filter: blur(6px); /* Ajusta la intensidad del desenfoque */
+    background-color: rgba(0, 0, 0, 0.4); /* Fondo semitransparente */
+}
+
+/* Estilos para el header */
+.custom-dialog .p-dialog-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    border-radius: 8px 8px 0 0;
+    padding: 15px;
+}
+
+.custom-dialog .p-dialog-header .p-dialog-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+/* Estilos para el footer */
+.custom-dialog .p-dialog-footer {
+    background-color: #ffffff;
+    border-top: 1px solid #ddd;
+    border-radius: 0 0 8px 8px;
+    padding: 15px;
+}
+
+/* Opcional: Asegurar que el botón se destaque */
+.button-dialog {
+    width: 100%;
+    background-color: #4caf50;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    padding: 15px;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+.button-dialog:hover {
+    background-color: #45a049;
+}
+
+.label-dialog {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+}

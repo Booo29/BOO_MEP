@@ -1,0 +1,63 @@
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f5f5f5;
+    padding: 20px; /* Añadimos un margen interno para pantallas pequeñas */
+}
+
+.titulo-principal {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.form-container {
+    width: 100%; /* Ajuste completo al ancho del contenedor */
+    max-width: 700px; /* Ancho máximo para mantener un diseño compacto */
+    display: block; /* Eliminamos el `flex` para un ajuste más fluido */
+}
+
+.card-custom {
+    width: 100%; /* Ancho completo dentro del contenedor */
+    padding: 30px; /* Espaciado interno */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    border: 2px solid #4caf50;
+    background-color: #fff;
+}
+
+.p-inputtext {
+    width: 100%; /* Aseguramos que los inputs ocupen todo el ancho */
+    font-size: 1rem; /* Aumentamos el tamaño del texto */
+    padding: 15px; /* Espaciado interno */
+    margin-bottom: 1rem; /* Espacio entre los inputs */
+    box-sizing: border-box; /* Incluimos el padding en el ancho total */
+}
+
+.label-profesor {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.custom-button {
+    width: 100%;
+    background-color: #4caf50;
+    color: #ffffff;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.2rem;
+    padding: 15px;
+    margin-top: 1rem;
+    cursor: pointer;
+}
+
+.custom-button:hover {
+    background-color: #45a049;
+}
