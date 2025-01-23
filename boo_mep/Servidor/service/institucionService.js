@@ -190,37 +190,75 @@ const PostInstitucionConMaterias = (req, res) => {
 };
 
 
+// const GetInstitucionesMaterias = (req, res) => {
+//     const { idProfesor } = req.params;
+
+//     connection.query("SELECT " +
+//                         "i.Inst_Id," +
+//                         "i.Inst_Nombre, " +
+//                         "i.Inst_Tipo, " +
+//                         "i.Inst_DireccionRegional, " +
+//                         "i.Inst_Circuito, " +
+//                         "i.Profesores_idProfesores, " +
+//                         "GROUP_CONCAT(t.Mat_Nombre SEPARATOR ', ') AS Materias " +
+//                         "FROM " +
+//                             "instituciones AS i " +
+//                         "INNER JOIN " +
+//                             "materia_institucion AS m ON m.Instituciones_Inst_Id = i.Inst_Id " +
+//                         "INNER JOIN " +
+//                             "materias AS t ON t.Mat_Id = m.Materias_Mat_Id " +
+//                         "WHERE " +
+//                             "i.Inst_Estado = 'A' " +
+//                             "AND m.Mat_Ins_Estado = 'A' " +
+//                             "AND i.Profesores_idProfesores = ? " +
+//                             "GROUP BY i.Inst_Id, i.Inst_Nombre; "
+//         , [idProfesor], (err, results) => {
+//         if (err) {
+//             console.log(err);
+//             return res.status(500).send("Error al obtener instituciones");
+//         } else {
+//             return res.status(200).json(results);
+//         }
+//     });
+// }
+
 const GetInstitucionesMaterias = (req, res) => {
     const { idProfesor } = req.params;
 
-    connection.query("SELECT " +
-                        "i.Inst_Id," +
-                        "i.Inst_Nombre, " +
-                        "i.Inst_Tipo, " +
-                        "i.Inst_DireccionRegional, " +
-                        "i.Inst_Circuito, " +
-                        "i.Profesores_idProfesores, " +
-                        "GROUP_CONCAT(t.Mat_Nombre SEPARATOR ', ') AS Materias " +
-                        "FROM " +
-                            "instituciones AS i " +
-                        "INNER JOIN " +
-                            "materia_institucion AS m ON m.Instituciones_Inst_Id = i.Inst_Id " +
-                        "INNER JOIN " +
-                            "materias AS t ON t.Mat_Id = m.Materias_Mat_Id " +
-                        "WHERE " +
-                            "i.Inst_Estado = 'A' " +
-                            "AND m.Mat_Ins_Estado = 'A' " +
-                            "AND i.Profesores_idProfesores = ? " +
-                            "GROUP BY i.Inst_Id, i.Inst_Nombre; "
-        , [idProfesor], (err, results) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send("Error al obtener instituciones");
-        } else {
-            return res.status(200).json(results);
+    connection.query(
+        `
+        SELECT 
+            i.Inst_Id,
+            i.Inst_Nombre,
+            i.Inst_Tipo,
+            i.Inst_DireccionRegional,
+            i.Inst_Circuito,
+            i.Profesores_idProfesores,
+            GROUP_CONCAT(t.Mat_Nombre SEPARATOR ', ') AS Materias
+        FROM 
+            instituciones AS i
+        LEFT JOIN 
+            materia_institucion AS m ON m.Instituciones_Inst_Id = i.Inst_Id AND m.Mat_Ins_Estado = 'A'
+        LEFT JOIN 
+            materias AS t ON t.Mat_Id = m.Materias_Mat_Id
+        WHERE 
+            i.Inst_Estado = 'A'
+            AND i.Profesores_idProfesores = ?
+        GROUP BY 
+            i.Inst_Id, i.Inst_Nombre, i.Inst_Tipo, i.Inst_DireccionRegional, i.Inst_Circuito, i.Profesores_idProfesores;
+        `,
+        [idProfesor],
+        (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error al obtener instituciones");
+            } else {
+                return res.status(200).json(results);
+            }
         }
-    });
-}
+    );
+};
+
 
 
 app.get("/institucion/:idProfesor", GetInstituciones);

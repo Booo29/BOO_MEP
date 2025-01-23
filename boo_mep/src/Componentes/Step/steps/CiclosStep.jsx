@@ -1,133 +1,77 @@
-import React, { useState, useEffect } from "react";
-import { Dialog } from "primereact/dialog";
+import React, { useState } from "react";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { getCiclos, postCiclo, putCiclo, deleteCiclo } from "../../../Servicios/CicloService";
+import { ListBox } from "primereact/listbox";
+import { postCiclo } from "../../../Servicios/CicloService";
 import useStore from "../../../store/store";
-
+import useCicloStore from "../../../store/CicloStore";
+import Swal from "sweetalert2";
 
 const CiclosStep = () => {
-
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [ciclos, setCiclos] = useState([]);
-  const [selectedCiclo, setSelectedCiclo] = useState(null);
   
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
+  const [numPeriodos, setNumPeriodos] = useState(0); 
+  const [periodos, setPeriodos] = useState([]);
+
   const idInstitucion = useStore((state) => state.institutionId);
-
-  console.log("CiclosManager");
-
-  useEffect(() => {
-    if (idInstitucion) {
-      fetchCiclos();
-    }
-  }, [idInstitucion]);
-
-  const fetchCiclos = async () => {
-    try {
-      const data = await getCiclos(idInstitucion);
-      console.log("Ciclos:", data);
-      setCiclos(data.map((ciclo) => ({
-        id: ciclo.Cic_Id || 0,
-        fechaInicio: ciclo.Cic_Fecha_Inicio || "",
-        fechaFin: ciclo.Cic_Fecha_Fin || "",
-      })));
-    } catch (error) {
-      console.error("Error fetching ciclos:", error);
-    }
-  };
-
-  const formatFecha = (rowData, field) => {
-    const fecha = new Date(rowData[field]);
-    return new Intl.DateTimeFormat('es-CR', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    }).format(fecha);
-  };
-
-  const handleAddCiclo = () => {
-    setSelectedCiclo(null);
-    setFechaInicio("");
-    setFechaFin("");
-    setIsAddModalOpen(true);
-  };
-
-  const handleEditCiclo = (ciclo) => {
-    setSelectedCiclo(ciclo);
-    const formattedFechaInicio = new Date(ciclo.fechaInicio).toISOString().split('T')[0];
-    const formattedFechaFin = new Date(ciclo.fechaFin).toISOString().split('T')[0];
-  
-    setFechaInicio(formattedFechaInicio);
-    setFechaFin(formattedFechaFin);
-    
-    setIsAddModalOpen(true);
-  };
-
-  const handleDeleteCiclo = async (cicloId) => {
-    try {
-      await deleteCiclo(cicloId);
-      fetchCiclos();
-    } catch (error) {
-      console.error("Error deleting ciclo:", error);
-    }
-  };
+  const setCicloId = useCicloStore((state) => state.setCicloId);
 
   const handleSaveCiclo = async () => {
-    const cicloData = {
-      idCiclo: selectedCiclo?.id,
-      fechaInicio,
-      fechaFin,
-      idInstitucion,
-    };
 
     try {
-      if (selectedCiclo) {
-        console.log("Updating ciclo:", cicloData);
-      
-        await putCiclo(cicloData);
-      } else {
-        await postCiclo(cicloData);
-      }
-      fetchCiclos();
-      setIsAddModalOpen(false);
+
+        const cantidadPeriodos = parseInt(document.getElementById("periodo").value, 10);
+
+        const periodos = Array.from({ length: cantidadPeriodos }, (_, index) => ({
+          nombre: `${index + 1} periodo`,
+        }));
+    
+        const cicloData = {
+          fechaInicio,
+          fechaFin,
+          idInstitucion,
+          periodos,
+        };
+        const response = await postCiclo(cicloData);
+        console.log("response", response);
+        const cicloId = response.cicloId;
+        setCicloId(cicloId);
+        Swal.fire({
+          icon: 'success',
+          title: 'Ciclo creado correctamente',
+          showConfirmButton: false,
+          position: 'top-end',
+          timer: 1500
+        });
     } catch (error) {
       console.error("Error saving ciclo:", error);
     }
   };
-  
 
 
-  const renderTableActions = (rowData) => (
-    <div>
-      <Button label="Editar" icon="pi pi-pencil" onClick={() => handleEditCiclo(rowData)} style={{ marginRight: "0.5em" }} />
-      <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" onClick={() => handleDeleteCiclo(rowData.id)} />
-    </div>
-  );
+  const generatePeriodos = (count) => {
+    const generatedPeriodos = Array.from({ length: count }, (_, i) => `${i + 1} periodo`);
+    setPeriodos(generatedPeriodos);
+  };
+
+
+  const handleNumPeriodosChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    if (value > 0) {
+      setNumPeriodos(value);
+      generatePeriodos(value);
+    } else {
+      setNumPeriodos("");
+      setPeriodos([]);
+    }
+  };
+
 
   return (
     <div>
-
         <div>
-          <Button label="Añadir Ciclo" icon="pi pi-plus" onClick={handleAddCiclo} className="p-mb-3" style={{ marginBottom: "0.5em" }} />
-          {/* Tabla de Ciclos */}
-          <DataTable value={ciclos} paginator rows={10}>
-            <Column field="id" header="ID" />
-            <Column header="Fecha de Inicio" body={(rowData) => formatFecha(rowData, 'fechaInicio')} />
-            <Column header="Fecha de Fin" body={(rowData) => formatFecha(rowData, 'fechaFin')} />
-            <Column body={renderTableActions} header="Acciones" />
-          </DataTable>
-        </div>
-
-
-      {/* Modal para Añadir/Editar Ciclo */}
-      <Dialog visible={isAddModalOpen} onHide={() => setIsAddModalOpen(false)} header={selectedCiclo ? "Editar Ciclo" : "Añadir Ciclo"} style={{ width: "50vw" }}>
-        <div>
-          {/* Formulario para Añadir/Editar Ciclo */}
-          <form onSubmit={(e) => { e.preventDefault(); handleSaveCiclo(); }}>
+          <form onSubmit={(e) => { e.preventDefault()}}>
             <div className="p-field">
               <label htmlFor="fechaInicio">Fecha de Inicio</label>
               <input id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
@@ -136,10 +80,23 @@ const CiclosStep = () => {
               <label htmlFor="fechaFin">Fecha de Fin</label>
               <input id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
             </div>
-            <Button label="Guardar" type="submit" />
+            <div className="p-field">
+              <label htmlFor="periodo">Cuantos periodos desea que tenga el ciclo</label>
+              <input id="periodo" type="number" className="p-inputtext" value={numPeriodos} onChange={handleNumPeriodosChange} required />
+            </div>
+            <div className="p-field" style={{ marginBottom: "1em" }}>
+              <label htmlFor="periodos">Periodos Ingresados</label>
+              <ListBox 
+                options={periodos}
+                multiple
+                disabled
+                style={{ maxHeight: '200px', overflow: 'auto' }}
+                value={null}
+              />
+            </div>
+            <Button label="Guardar" type="submit" onClick={handleSaveCiclo}/>
           </form>
         </div>
-      </Dialog>
     </div>
   );
 };

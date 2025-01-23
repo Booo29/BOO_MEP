@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import InstitucionCard from "./InstitucionCard";
 import AddInstitucionDialog from "./AddInstitucionDialog";
-import { getInstitucionesConMaterias, deleteInstitucion, putInstitucion, postInstitucionConMaterias, getInstituciones } from "../../Servicios/InstitucionService";
+import { getInstitucionesConMaterias, deleteInstitucion, putInstitucion, postInstitucion, getInstituciones } from "../../Servicios/InstitucionService";
 import { getMaterias} from "../../Servicios/MateriaService";
 import "./Institucion.css";
 import Cookies from 'universal-cookie';
@@ -19,8 +19,8 @@ const InstitucionesView = () => {
 
     const [instituciones, setInstituciones] = useState([]);
     // const [materiasDisponibles, setMateriasDisponibles] = useState([]);
-    // const [isDialogVisible, setDialogVisible] = useState(false);
-    // const [selectedInstitucion, setSelectedInstitucion] = useState(null);
+    const [isDialogVisible, setDialogVisible] = useState(false);
+    const [selectedInstitucion, setSelectedInstitucion] = useState(null);
 
     // const [dialogVisibleCiclo, setDialogVisibleCiclo] = useState(false);
     // const [isCiclosDialogVisible, setCiclosDialogVisible] = useState(false);
@@ -47,43 +47,43 @@ const InstitucionesView = () => {
         fetchInstituciones();
     }, []);
 
-    // const handleAddEdit = async (datos) => {
+    const handleAddEdit = async (datos) => {
 
-    //     try {
-    //         if (datos.idInstitucion) {
-    //             console.log("Datos a actualizar", datos);
-    //             await putInstitucion(datos);
-    //             Swal.fire({
-    //                 title: "Guardado",
-    //                 text: "La institución ha sido actualizada",
-    //                 icon: "success",
-    //                 position: "top-end",
-    //                 showConfirmButton: false,
-    //                 timer: 1500,
-    //             })
-    //         } else {
-    //             datos.idProfesor = idProfesor;
-    //             console.log("Datos a guardar", datos);
-    //             await postInstitucionConMaterias(datos);
-    //             Swal.fire({
-    //                 title: "Guardado",
-    //                 text: "La institución ha sido Guardada",
-    //                 icon: "success",
-    //                 position: "top-end",
-    //                 showConfirmButton: false,
-    //                 timer: 1500,
-    //             })
-    //         }
-    //       fetchInstituciones();
-    //         setDialogVisible(false);
-    //     } catch (error) {
-    //         console.error("Error al guardar institución:", error);
-    //     }
-    // };
+        try {
+            if (datos.idInstitucion) {
+                console.log("Datos a actualizar", datos);
+                await putInstitucion(datos);
+                Swal.fire({
+                    title: "Guardado",
+                    text: "La institución ha sido actualizada",
+                    icon: "success",
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+            } else {
+                datos.idProfesor = idProfesor;
+                console.log("Datos a guardar", datos);
+                await postInstitucion(datos);
+                Swal.fire({
+                    title: "Guardado",
+                    text: "La institución ha sido Guardada",
+                    icon: "success",
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+            }
+          fetchInstituciones();
+            setDialogVisible(false);
+        } catch (error) {
+            console.error("Error al guardar institución:", error);
+        }
+    };
 
-    const handleAdd = () => {
-        navigate('/StepsFormPage');
-    }
+    // const handleAdd = () => {
+    //     navigate('/StepsFormPage');
+    // }
 
     const handleDelete = async (id) => {
         Swal.fire({
@@ -130,34 +130,33 @@ const InstitucionesView = () => {
                 label="Agregar Institución"
                 icon="pi pi-plus"
                 className="p-button-success button-institucion"
-                onClick={handleAdd}
-                // onClick={() => {
-                //     setSelectedInstitucion(null);
-                //     setDialogVisible(true);
-                // }}
+                // onClick={handleAdd}
+                onClick={() => {
+                    setSelectedInstitucion(null);
+                    setDialogVisible(true);
+                }}
             />
-            <div className="instituciones-list">
+            <div className="instituciones-list" >
                 {instituciones.map((institucion) => (
                     <InstitucionCard
                         key={institucion.Inst_Id}
                         institucion={institucion}
-                        // onEdit={() => {
-                        //     setSelectedInstitucion(institucion);
-                        //     setDialogVisible(true);
-                        // }}
+                        onEdit={() => {
+                            setSelectedInstitucion(institucion);
+                            setDialogVisible(true);
+                        }}
                         onDelete={() => handleDelete(institucion.Inst_Id)}
                         // onManageCiclos={() => handleManageCiclos(institucion)}
                     />
                 ))}
             </div>
-            {/* <AddInstitucionDialog
+            <AddInstitucionDialog
                 visible={isDialogVisible}
                 onHide={() => setDialogVisible(false)}
                 onSave={handleAddEdit}
                 institucion={selectedInstitucion}
-                materiasDisponibles={materiasDisponibles}
             />
-            <CiclosManager
+            {/* <CiclosManager
                 idInstitucion={selectedCiclosInstitucion?.Inst_Id}
                 visible={isCiclosDialogVisible}
                 onClose={() => setCiclosDialogVisible(false)}

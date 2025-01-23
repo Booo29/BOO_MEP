@@ -1,46 +1,44 @@
 import React, { useState } from 'react';
 import { Steps } from 'primereact/steps';
 import { Button } from 'primereact/button';
-import InstitutionInfoStep from './steps/InstitutionInfoStep'; 
-import MateriasStep from './steps/MateriasStep'; 
+// import InstitutionInfoStep from './steps/InstitutionInfoStep'; 
+// import MateriasStep from './steps/MateriasStep'; 
 import CiclosStep from './steps/CiclosStep';
+import GradoSeccionesStep from './steps/GradoSeccionesStep';
+import MateriaSeccionStep from './steps/MateriaSeccionStep';
 // import PeriodosStep from './steps/PeriodosStep';
 // import EvaluacionesStep from './steps/EvaluacionesStep';
-// import SeccionesStep from './steps/SeccionesStep';
+
 
 const StepsForm = () => {
   const [activeStep, setActiveStep] = useState(0);
 
-  
 
-  // Función para avanzar al siguiente paso
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
 
-  // Función para retroceder al paso anterior
+  
   const handlePrevious = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
-  // Definir los pasos de la aplicación
+  
   const steps = [
-    { label: 'Información de la Institución' },
+    { label: 'Ciclos y Periodos' },
+    { label: 'Grados y Secciones' },
     { label: 'Materias' },
-    { label: 'Ciclos' },
-    { label: 'Periodos' },
-    { label: 'Evaluaciones' },
-    { label: 'Secciones' },
+    { label: 'Rubros de Evaluación' },
+    { label: 'Añadir estudiantes' },
   ];
 
   return (
     <div>
       <Steps model={steps} activeIndex={activeStep} style={{marginTop: '40px'}} />
       <div className="step-content" style={{ marginTop: '20px', minHeight: '150px', padding: '20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9', boxShadow: '0 2px 4px 0 rgba(0,0,0,0.1)', marginBottom: '20px' }}>
-        {/* Aquí se renderiza el componente correspondiente según el paso activo */}
-        {activeStep === 0 && <InstitutionInfoStep/>}
-        {activeStep === 1 && <MateriasStep/>}
-        {activeStep === 2 && <CiclosStep/>}
+        {activeStep === 0 && <CiclosStep/>}
+        {activeStep === 1 && <GradoSeccionesStep/>}
+        {activeStep === 2 && <MateriaSeccionStep/>}
         {/* {activeStep === 3 && <PeriodosStep formData={formData} setFormData={setFormData} />}
         {activeStep === 4 && <EvaluacionesStep formData={formData} setFormData={setFormData} />}
         {activeStep === 5 && <SeccionesStep formData={formData} setFormData={setFormData} />} */}

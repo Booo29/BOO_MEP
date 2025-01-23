@@ -14,6 +14,10 @@ app.use(require('./service/institucionService.js'));
 app.use(require('./service/cicloService.js'));
 app.use(require('./service/materiaService.js'));
 app.use(require('./service/materiaInstitucionService.js'));
+app.use(require('./service/periodoService.js'));
+app.use(require('./service/gradoService.js'));
+// app.use(require('./service/seccionService.js'));
+app.use(require('./service/gradoSeccionService.js'));
 
 
 app.listen(3000, () => {

@@ -5,13 +5,13 @@ import "./Institucion.css";
 import useStore from "../../store/store"
 
 
-const InstitucionCard = ({ institucion, onDelete}) => {
+const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
 
      const navigate = useNavigate();
     
     const setInstitutionId = useStore((state) => state.setInstitutionId);
 
-    const handleEdit = () => {
+    const handleAddCiclo = () => {
         setInstitutionId(institucion.Inst_Id);
         navigate('/StepsFormPage');
     }
@@ -25,7 +25,9 @@ const InstitucionCard = ({ institucion, onDelete}) => {
             <p><strong>Materias:</strong> {institucion.Materias}</p>
             <div className="card-actions">
                 <Button label="Ingresar" icon="pi pi-calendar" className="p-button-primary" severity="success"  />
-                <Button label="Editar" icon="pi pi-pencil" className="p-button-warning" severity="info" onClick={handleEdit}/>
+                <Button label="Editar Institución" icon="pi pi-pencil" className="p-button-info" severity="info" onClick={onEdit} />
+                <Button label="Ingresar Ciclo" icon="pi pi-calendar" className="p-button-help" severity="help" onClick={handleAddCiclo} />
+                <Button label="Ciclos anteriores" icon="pi pi-calendar" className="p-button-warning" severity="warning" />
                 <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" severity="danger" onClick={onDelete} />
             </div>
 
