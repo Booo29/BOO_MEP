@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const getPeriodos = async (idInstitucion) => {
+export const getPeriodos = async (idCiclo) => {
     try {
-        const response = await axios.get(`http://localhost:3000/periodo/${idInstitucion}`);
+        const response = await axios.get(`http://localhost:3000/periodos/${idCiclo}`);
         return response.data;
 
     } catch (error) {

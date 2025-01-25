@@ -4,13 +4,41 @@ const app = express.Router();
 const { connection } = require("../config");
 
 const GetGradoSecciones = (req, res) => {
-    connection.query("SELECT * FROM grado_seccion", (err, results) => {
+    const { cicloId, institucionId } = req.query;
+
+    if (!cicloId || !institucionId) {
+        return res.status(400).send("Por favor, proporciona los parámetros cicloId e institucionId.");
+    }
+
+    const query = `
+        SELECT 
+            gs.Gra_Sec_Nombre, 
+            g.Gra_Nombre,
+            gs.Id_Grado_Seccion
+        FROM 
+            grado_seccion gs
+        INNER JOIN 
+            ciclo c ON gs.Ciclo_Cic_Id = c.Cic_Id
+        INNER JOIN 
+            instituciones i ON c.Instituciones_idInstituciones = i.Inst_Id
+        INNER JOIN 
+            grados g ON gs.Grados_idGrados = g.Gra_Id
+        WHERE 
+            c.Cic_Id = ? AND 
+            i.Inst_Id = ?
+    `;
+
+    connection.query(query, [cicloId, institucionId], (err, results) => {
         if (err) {
-            console.log(err);
-            return res.status(500).send("Error al obtener grado_seccion");
-        } else {
-            return res.status(200).send(results);
+            console.error("Error al obtener la información:", err);
+            return res.status(500).send("Error al obtener la información de grado_seccion.");
         }
+
+        if (results.length === 0) {
+            return res.status(404).send("No se encontraron datos para el ciclo e institución especificados.");
+        }
+
+        return res.status(200).json(results);
     });
 }
 

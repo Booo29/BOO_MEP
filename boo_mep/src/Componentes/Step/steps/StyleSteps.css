@@ -41,15 +41,35 @@
 /* estilos de la página de asignación de materias */
 
 .asignar-materias-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
 }
 
-.p-field {
+.asignar-todas-container {
     margin-bottom: 20px;
 }
+
+.grados-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.grado-card {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.secciones-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.seccion-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
 

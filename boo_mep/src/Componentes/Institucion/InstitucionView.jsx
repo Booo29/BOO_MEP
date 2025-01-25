@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import InstitucionCard from "./InstitucionCard";
 import AddInstitucionDialog from "./AddInstitucionDialog";
-import { getInstitucionesConMaterias, deleteInstitucion, putInstitucion, postInstitucion, getInstituciones } from "../../Servicios/InstitucionService";
-import { getMaterias} from "../../Servicios/MateriaService";
+import { deleteInstitucion, putInstitucion, postInstitucion, getInstituciones } from "../../Servicios/InstitucionService";
 import "./Institucion.css";
 import Cookies from 'universal-cookie';
 import { jwtDecode } from "jwt-decode";
 import Swal from "sweetalert2";
-import CiclosManager from "../Ciclo/Ciclo";
 import { useNavigate } from 'react-router-dom';
 
 const InstitucionesView = () => {
@@ -31,7 +29,7 @@ const InstitucionesView = () => {
 
     const fetchInstituciones = async () => {
         try {
-            const data = await getInstitucionesConMaterias(idProfesor);
+            const data = await getInstituciones(idProfesor);
             //const data = await getInstituciones(idProfesor);
             //const materias = await getMaterias();
             //console.log("data view", insti);

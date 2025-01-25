@@ -43,3 +43,14 @@ export const deleteMateria = async (idMateria) => {
         throw error;
     }
 }
+
+export const getMateriasByCiclo = async (cicloId) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/materia/ciclo/${cicloId}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

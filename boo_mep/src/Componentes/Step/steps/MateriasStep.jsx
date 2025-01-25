@@ -54,7 +54,7 @@ const MateriasStep = () => {
 
     const handleAddMateria = async (materia) => {
         try {
-            console.log('materia', materia);
+            
             await postMateriaInstitucion({
                 materias: [{ idMateria: materia.id, idInstitucion: institutionId }],
             });

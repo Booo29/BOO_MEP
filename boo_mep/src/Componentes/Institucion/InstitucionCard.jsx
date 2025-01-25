@@ -22,7 +22,6 @@ const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
             <p><strong>Tipo:</strong> {institucion.Inst_Tipo}</p>
             <p><strong>Dirección Regional:</strong> {institucion.Inst_DireccionRegional}</p>
             <p><strong>Circuito:</strong> {institucion.Inst_Circuito}</p>
-            <p><strong>Materias:</strong> {institucion.Materias}</p>
             <div className="card-actions">
                 <Button label="Ingresar" icon="pi pi-calendar" className="p-button-primary" severity="success"  />
                 <Button label="Editar Institución" icon="pi pi-pencil" className="p-button-info" severity="info" onClick={onEdit} />

@@ -18,6 +18,9 @@ app.use(require('./service/periodoService.js'));
 app.use(require('./service/gradoService.js'));
 // app.use(require('./service/seccionService.js'));
 app.use(require('./service/gradoSeccionService.js'));
+app.use(require('./service/gradoSeccionMateriaService.js'));
+app.use(require('./service/rubrosService.js'));
+app.use(require('./service/estudianteService.js'));
 
 
 app.listen(3000, () => {
