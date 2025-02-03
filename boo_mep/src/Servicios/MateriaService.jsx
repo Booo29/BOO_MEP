@@ -54,3 +54,14 @@ export const getMateriasByCiclo = async (cicloId) => {
         throw error;
     }
 }
+
+export const GetMateriasByGradoSeccion = async (GradoSeccionId) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/materia/seccion/?GradoSeccionId=${GradoSeccionId}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error
+    }
+}

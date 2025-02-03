@@ -54,34 +54,37 @@ const Login = () => {
 
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-left">
-          <img
-            src={imgLogin}
-            alt="Imagen"
-            className="login-image"
-          />
-        </div>
-        <div className="login-right">
-          <div className="login-logo">
-            <h2>Iniciar Sesión</h2>
-          </div>
-          <form>
-            <label htmlFor="usuario">Usuario:</label>
-            <input type="email" id="usuario" name="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
+    <div style={{ padding: "16px" }} >
+       <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>Bienvenido/a a EDUPLAN la plataforma de evaluación docente</h1>
+        <div className="login-page" >
+          <div className="login-card">
+            <div className="login-left">
+              <img
+                src={imgLogin}
+                alt="Imagen"
+                className="login-image"
+              />
+            </div>
+            <div className="login-right">
+              <div className="login-logo">
+                <h1>Iniciar Sesión</h1>
+              </div>
+              <form>
+                <label htmlFor="usuario" style={{fontWeight: "bold", fontSize: "25px"}}>Usuario:</label>
+                <input type="email" id="usuario" name="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
 
-            <label htmlFor="password">Contraseña:</label>
-            <input type="password" id="password" name="password"value={password} onChange={(e) => setPassword(e.target.value)} />
+                <label htmlFor="password" style={{fontWeight: "bold", fontSize: "25px"}}>Contraseña:</label>
+                <input type="password" id="password" name="password"value={password} onChange={(e) => setPassword(e.target.value)} />
 
-            <button type='button' className='button_loggin' onClick={Login}>Iniciar Sesión</button>
-          </form>
-          <div className="login-signup-link">
-            ¿Es tu primera vez? <Link to="/RegistroProfesorPage">Crea tu usuario</Link>
+                <button type='button' className='button_loggin' onClick={Login}>Iniciar Sesión</button>
+              </form>
+              <div className="login-signup-link">
+                ¿Es tu primera vez? <Link style={{fontWeight: "bold", fontSize: "25px"}} to="/RegistroProfesorPage">Crea tu usuario</Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

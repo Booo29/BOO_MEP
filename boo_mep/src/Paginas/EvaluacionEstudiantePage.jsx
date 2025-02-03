@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
 import Cookies from 'universal-cookie';
 import { useNavigate } from "react-router-dom";
-import MenuDatosImportantes from '../Componentes/Menu/MenuDatosImportantes';
+import EvaluacionEstudiante from '../Componentes/EvaluacionEstudiante/EvaluacionEstudiante';
 
-const MenuDatosImportantesPage = () => {
+const EvaluacionEstudiantePage = () => {
 
   const navegar = useNavigate();
   const cookies = new Cookies();
@@ -16,9 +16,9 @@ const MenuDatosImportantesPage = () => {
   
   return (
     <div>
-      <MenuDatosImportantes />
+      <EvaluacionEstudiante />
     </div>
   );
 };
 
-export default MenuDatosImportantesPage;
+export default EvaluacionEstudiantePage;

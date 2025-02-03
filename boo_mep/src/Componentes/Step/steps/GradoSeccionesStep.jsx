@@ -179,7 +179,7 @@ const GradoSeccionesStep = () => {
                                 Tipo: <strong style={{fontSize: "20px", fontWeight: "bold",}}>{grado.Gra_Tipo}</strong>
                             </p>
                             <div>
-                                <label style={{fontSize: "20px", fontWeight: "bold",}}>Cantidad de Secciones:</label>
+                                <label style={{fontSize: "20px", fontWeight: "bold", marginRight: "10px"}}>Cantidad de Secciones:</label>
                                 <InputNumber
                                     value={grado.secciones.length}
                                     onValueChange={(e) =>
@@ -223,7 +223,7 @@ const GradoSeccionesStep = () => {
             <Dialog
                 header="Crear Nuevo Grado"
                 visible={showDialog}
-                style={{ width: "600px" }}
+                style={{ width: "800px" }}
                 onHide={() => setShowDialog(false)}
                 footer={
                     <div>
@@ -246,6 +246,7 @@ const GradoSeccionesStep = () => {
                         <label htmlFor="nombre" style={{fontSize: "20px", fontWeight: "bold",}}>Nombre del Grado</label>
                         <InputText
                             id="nombre"
+                            style={{ width: "100%", marginTop: "0.5rem", fontSize: "20px", fontWeight: "bold"}}
                             value={nuevoGrado.Gra_Nombre}
                             onChange={(e) =>
                                 setNuevoGrado({ ...nuevoGrado, Gra_Nombre: e.target.value })

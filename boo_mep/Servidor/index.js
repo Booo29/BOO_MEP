@@ -21,7 +21,10 @@ app.use(require('./service/gradoSeccionService.js'));
 app.use(require('./service/gradoSeccionMateriaService.js'));
 app.use(require('./service/rubrosService.js'));
 app.use(require('./service/estudianteService.js'));
-
+app.use(require('./service/AsistenciaService.js'));
+app.use(require('./service/EvaluacionService.js'));
+app.use(require('./service/NotasService.js'));
+app.use(require('./service/InformesService.js'));
 
 app.listen(3000, () => {
     console.log("El servidor está inicializado en el puerto 3000");

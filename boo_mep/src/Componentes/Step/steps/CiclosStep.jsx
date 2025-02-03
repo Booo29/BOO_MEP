@@ -73,19 +73,19 @@ const CiclosStep = () => {
         <div>
           <form onSubmit={(e) => { e.preventDefault()}}>
             <div className="p-field">
-              <label htmlFor="fechaInicio">Fecha de Inicio</label>
-              <input id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
+              <label htmlFor="fechaInicio" style={{fontWeight: "bold", fontSize: "25px"}}>Fecha de Inicio</label>
+              <input id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required style={{fontSize: "20px"}} />
             </div>
             <div className="p-field">
-              <label htmlFor="fechaFin">Fecha de Fin</label>
-              <input id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
+              <label htmlFor="fechaFin" style={{fontWeight: "bold", fontSize: "25px"}}>Fecha de Fin</label>
+              <input id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required style={{fontSize: "20px"}}/>
             </div>
             <div className="p-field">
-              <label htmlFor="periodo">Cuantos periodos desea que tenga el ciclo</label>
-              <input id="periodo" type="number" className="p-inputtext" value={numPeriodos} onChange={handleNumPeriodosChange} required />
+              <label htmlFor="periodo" style={{fontWeight: "bold", fontSize: "25px"}}>Cuantos periodos desea que tenga el ciclo</label>
+              <input id="periodo" type="number" className="p-inputtext" value={numPeriodos} onChange={handleNumPeriodosChange} required style={{fontSize: "20px"}}/>
             </div>
             <div className="p-field" style={{ marginBottom: "1em" }}>
-              <label htmlFor="periodos">Periodos Ingresados</label>
+              <label htmlFor="periodos" style={{fontWeight: "bold", fontSize: "25px"}}>Periodos Ingresados</label>
               <ListBox 
                 options={periodos}
                 multiple

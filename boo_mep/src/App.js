@@ -4,10 +4,14 @@ import React from 'react';
 import LoginPage from "./Paginas/LoginPage";
 import RegistroProfesorPage from "./Paginas/RegistroProfesorPage";
 import MenuPage from "./Paginas/MenuPage";
-import MenuDatosImportantesPage from "./Paginas/MenuDatosImportantesPage";
 import InstitucionesPage from "./Paginas/InstitucionPage";
 import StepsFormPage from "./Paginas/StepsFormPage";
-
+import AsistenciaPage from "./Paginas/AsistenciaPage";
+import EvaluacionesPage from "./Paginas/EvaluacionesPage";
+import EvaluacionesStepFormPage from "./Paginas/EvaluacionesStepFormPage";
+import EvaluacionEstudiantePage from "./Paginas/EvaluacionEstudiantePage";
+import ListasPage from "./Paginas/ListasPage";
+import InformesPage from "./Paginas/InformesPage";
 
 export function App() {
   return (
@@ -18,9 +22,14 @@ export function App() {
           <Route path="/LoginPage" element={<LoginPage />} />
           <Route path="/RegistroProfesorPage" element={<RegistroProfesorPage />} />
           <Route path="/MenuPage" element={<MenuPage />} />
-          <Route path="/MenuDatosImportantesPage" element={<MenuDatosImportantesPage />} />
           <Route path="/InstitucionesPage" element={<InstitucionesPage />} />
           <Route path="/StepsFormPage" element={<StepsFormPage />} />
+          <Route path="/AsistenciaPage" element={<AsistenciaPage />} />
+          <Route path="/EvaluacionesPage" element={<EvaluacionesPage />} />
+          <Route path="/EvaluacionesStepFormPage" element={<EvaluacionesStepFormPage />} />
+          <Route path="/EvaluacionEstudiantePage" element={<EvaluacionEstudiantePage />} />
+          <Route path="/ListasPage" element={<ListasPage />} />
+          <Route path="/InformesPage" element={<InformesPage />} />
           
 
           <Route path="*" element={<Navigate to="/" replace />} />

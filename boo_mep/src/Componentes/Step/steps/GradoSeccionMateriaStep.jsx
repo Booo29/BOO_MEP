@@ -42,7 +42,7 @@ const GradoSeccionMateriaStep = () => {
 
     const getGradoSeccion = async () => {
         try {
-            const response = await getGradoSecciones(4, 1);
+            const response = await getGradoSecciones(cicloId, institutionId);
             const data = response.reduce((acc, item) => {
                 const existingGrado = acc.find(
                     (grado) => grado.grado === item.Gra_Nombre
@@ -128,7 +128,7 @@ const GradoSeccionMateriaStep = () => {
                 seccion.materias.map((materiaId) => ({
                     Grado_Seccion_Id_Grado_Seccion: seccion.id,
                     Materias_Mat_Id: materiaId,
-                    Instituciones_Inst_Id: 1,
+                    Instituciones_Inst_Id: institutionId,
                 }))
             )
         );
@@ -140,11 +140,11 @@ const GradoSeccionMateriaStep = () => {
         <div className="asignar-materias-container">
             <Toast ref={toast} />
 
-            <h2>Asignar Materias a Grados y Secciones</h2>
-
+            <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>Asignar Materias a Grados y Secciones</h1>
+            <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
             {/* Asignar a todos los grados y secciones */}
             <div className="asignar-todas-container">
-                <h3>Asignar Materias a Todos los Grados y Secciones</h3>
+                <h3>Con esta opción podrás asignar las materias a todos los Grados y Secciones</h3>
                 <MultiSelect
                     value={materiasSeleccionadas}
                     options={materias}
@@ -160,7 +160,7 @@ const GradoSeccionMateriaStep = () => {
                     onClick={handleAsignarTodas}
                 />
             </div>
-
+            <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
             {/* Grados como cards */}
             <div className="grados-container">
                 {gradosYSecciones.map((grado, gradoIndex) => (
@@ -172,7 +172,7 @@ const GradoSeccionMateriaStep = () => {
                         <div className="secciones-container">
                             {grado.secciones.map((seccion, seccionIndex) => (
                                 <div key={seccion.id} className="seccion-item">
-                                    <h4>{seccion.nombre}</h4>
+                                    <h3>{seccion.nombre}</h3>
                                     <MultiSelect
                                         value={seccion.materias}
                                         style={{ width: "100%" }}

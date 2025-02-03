@@ -180,7 +180,7 @@ const TablaCiclosStep = () => {
         <div>
           <Button label="Añadir Ciclo" icon="pi pi-plus" onClick={handleAddCiclo} className="p-mb-3" style={{ marginBottom: "0.5em" }} />
 
-          <DataTable value={ciclos} paginator rows={10}>
+          <DataTable value={ciclos} paginator rows={10} stripedRows >
             <Column header="Fecha de Inicio" body={(rowData) => formatFecha(rowData, 'fechaInicio')} />
             <Column header="Fecha de Fin" body={(rowData) => formatFecha(rowData, 'fechaFin')} />
             <Column field="periodos" header="Periodos" body={(rowData) => rowData.periodos.length} />

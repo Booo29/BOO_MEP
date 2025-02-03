@@ -1,17 +1,21 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { MultiSelect } from "primereact/multiselect";
 import { InputText } from "primereact/inputtext";
 import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Card } from "primereact/card";
-import { Toast } from "primereact/toast";
+import Swal from "sweetalert2";
 import {getPeriodos} from '../../../Servicios/PeriodoService';
 import {getMateriasByCiclo} from '../../../Servicios/MateriaService';
 import {getGradoSeccionesMateria} from '../../../Servicios/GradoSeccionMateriaService';
 import {getRubros, postRubros, postRubrosConfigurados} from '../../../Servicios/RubrosService';
 
+import useCicloStore from "../../../store/CicloStore";
+
 const RubrosEvaluacionStep = () => {
+
+    const cicloId = useCicloStore((state) => state.cicloId);
 
     const [periodos, setPeriodos] = useState([]);
     const [materias, setMaterias] = useState([]);
@@ -31,19 +35,17 @@ const RubrosEvaluacionStep = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [nuevoRubro, setNuevoRubro] = useState({ nombre: "", porcentaje: 0 });
 
-    const toast = useRef(null);
-
     useEffect(() => {
 
         const fetchData = async () => {
             try {
-                const periodos = await getPeriodos(4);
+                const periodos = await getPeriodos(cicloId);
                 setPeriodosDisponibles(periodos.map(p => ({ label: p.Per_Nombre, value: p.Per_Id })));
 
-                const materias = await getMateriasByCiclo(4);
+                const materias = await getMateriasByCiclo(cicloId);
                 setMateriasDisponibles(materias.map(m => ({ label: m.Mat_Nombre, value: m.Mat_Nombre })));
 
-                const grados = await getGradoSeccionesMateria(4);
+                const grados = await getGradoSeccionesMateria(cicloId);
                 const gradosUnicos = Array.from(new Map(grados.map(g => [g.grado_nombre, g])).values());
                 setGradosDisponibles(gradosUnicos.map(g => ({
                     label: g.grado_nombre,
@@ -55,10 +57,12 @@ const RubrosEvaluacionStep = () => {
                 setRubrosDisponibles(rubros.map(r => ({ label: `${r.Rub_Nombre} (${r.Rub_Porcentaje}%)`, value: r })));
             } catch (error) {
                 console.error("Error al obtener datos:", error);
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "No se pudieron cargar los datos iniciales.",
+                Swal.fire({
+                    icon: "error",
+                    title: "Error al obtener datos",
+                    text: "Ocurrió un error al obtener los datos necesarios para la configuración de rubros.",
+                    timer: 2000,
+                    showConfirmButton: false,
                 });
             }
         };
@@ -80,27 +84,33 @@ const RubrosEvaluacionStep = () => {
                 { label: `${nuevo.Rub_Nombre} (${nuevo.Rub_Porcentaje}%)`, value: nuevo },
             ]);
             setShowDialog(false);
-            toast.current.show({
-                severity: "success",
-                summary: "Rubro Agregado",
-                detail: "El rubro fue creado correctamente.",
+             Swal.fire({
+                icon: "success",
+                title: "Rubro agregado con exito",
+                text: "El rubro se ha guardado correctamente.",
+                timer: 2000,
+                showConfirmButton: false,
             });
         } catch (error) {
             console.error("Error al agregar rubro:", error);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "No se pudo agregar el rubro.",
+            Swal.fire({
+                icon: "error",
+                title: "Error al agregar rubro",
+                text: "Hubo un error al agregar el rubro. Por favor, intenta de nuevo.",
+                timer: 2000,
+                showConfirmButton: false,
             });
         }
     };
 
     const insertarDatos = () => {
         if (periodos.length === 0 || materias.length === 0 || grados.length === 0 || rubros.length === 0) {
-            toast.current.show({
-                severity: "warn",
-                summary: "Datos Incompletos",
-                detail: "Por favor seleccione todos los campos.",
+            Swal.fire({
+                icon: "warning",
+                title: "Datos incompletos",
+                text: "Por favor, seleccione todos los datos antes de insertar.",
+                timer: 2000,
+                showConfirmButton: false,
             });
             return;
         }
@@ -147,27 +157,31 @@ const RubrosEvaluacionStep = () => {
                 Rub_Materia: d.materia
             }));
             console.log(payload);
-            //await postRubrosConfigurados(payload);
-            toast.current.show({
-                severity: "success",
-                summary: "Datos Guardados",
-                detail: "Los datos fueron guardados correctamente.",
+            postRubrosConfigurados(payload);
+            Swal.fire({
+                icon: "success",
+                title: "Datos guardados",
+                text: "Los datos se han guardado correctamente.",
+                timer: 2000,
+                showConfirmButton: false,
             });
             setDatosInsertados([]);
         } catch (error) {
             console.error("Error al guardar datos:", error);
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "No se pudieron guardar los datos.",
+            Swal.fire({
+                icon: "error",
+                title: "Error al guardar datos",
+                text: "Hubo un error al guardar los datos. Por favor, intenta de nuevo.",
+                timer: 2000,
+                showConfirmButton: false,
             });
         }
     };
 
     return (
         <div className="p-4">
-            <Toast ref={toast} />
-            <h2>Asignar Rubros de Evaluación</h2>
+            <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>Asignar Rubros de Evaluación</h1>
+            
             <div style={{ flex: 'none', minWidth: '150px', alignSelf: 'right', textAlign: 'right', marginBottom: '16px' }}>
                 <Button
                 label="Agregar Nuevo Rubro"
@@ -182,84 +196,91 @@ const RubrosEvaluacionStep = () => {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }} >
                 {/* Selección de períodos */}
                 <div style={{ flex: 1, minWidth: '250px' }}>
-                    <label htmlFor="periodos" className="block font-bold mb-2">Períodos</label>
+                    <label htmlFor="periodos" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Períodos</label>
                     <MultiSelect
                         value={periodos}
                         options={periodosDisponibles}
                         onChange={(e) => setPeriodos(e.value)}
                         placeholder="Seleccione Períodos"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
 
                 {/* Selección de materias */}
                 <div style={{ flex: 1, minWidth: '250px' }}>
-                    <label htmlFor="materias" className="block font-bold mb-2">Materias</label>
+                    <label htmlFor="materias" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Materias</label>
                     <MultiSelect
                         value={materias}
                         options={materiasDisponibles}
                         onChange={(e) => setMaterias(e.value)}
                         placeholder="Seleccione Materias"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
 
                 {/* Selección de grados */}
                 <div style={{ flex: 1, minWidth: '250px' }}>
-                    <label htmlFor="grados" className="block font-bold mb-2">Grados</label>
+                    <label htmlFor="grados" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Grados</label>
                     <MultiSelect
                         value={grados}
                         options={gradosDisponibles}
                         onChange={(e) => setGrados(e.value)}
                         placeholder="Seleccione Grados"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
                 <div style={{ flex: 1, minWidth: '250px' }}>
-                    <label htmlFor="rubros" className="block font-bold mb-2">Rubros de Evaluación</label>
+                    <label htmlFor="rubros" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Rubros de Evaluación</label>
                     <MultiSelect
                         value={rubros}
                         options={rubrosDisponibles}
                         onChange={(e) => setRubros(e.value)}
                         placeholder="Seleccione Rubros"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
             </div>
             <Dialog
                 header="Agregar Nuevo Rubro"
                 visible={showDialog}
+                style={{ width: "600px", height: "400px" }}
                 onHide={() => setShowDialog(false)}
             >
                 <div className="mb-3">
-                    <label htmlFor="nombreRubro" className="block font-bold mb-2">Nombre del Rubro</label>
+                    <label htmlFor="nombreRubro" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Nombre del Rubro</label>
                     <InputText
                         value={nuevoRubro.nombre}
                         onChange={(e) => setNuevoRubro({ ...nuevoRubro, nombre: e.target.value })}
                         placeholder="Nombre del Rubro"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="porcentajeRubro" className="block font-bold mb-2">Porcentaje</label>
+                    <label htmlFor="porcentajeRubro" className="block font-bold mb-2" style={{fontWeight: "bold", fontSize: "25px"}}>Porcentaje</label>
                     <InputNumber
                         value={nuevoRubro.porcentaje}
                         onChange={(e) => setNuevoRubro({ ...nuevoRubro, porcentaje: e.value })}
                         placeholder="Porcentaje"
                         className="w-full"
+                        style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                         min={0}
                         max={100}
                     />
                 </div>
-                <Button label="Agregar" icon="pi pi-check" onClick={agregarRubro} />
+                <Button label="Agregar" icon="pi pi-check" style={{fontSize: "20px"}} onClick={agregarRubro} />
             </Dialog>
             <Button label="Insertar" icon="pi pi-plus" className="p-button-success mb-4" onClick={insertarDatos} />
-            <h3>Datos Insertados</h3>
+            <h2 style={{fontSize: "25px", fontWeight: "bold"}}>Datos Insertados</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.values(grupos).map((g, i) => (
-                    <Card key={i} title={`${g.materia} - ${g.grado}`} style={{ marginBottom: '16px' }}>
+                    <Card key={i} title={`${g.materia} - ${g.grado}`} style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 'bold' }}>
                         <ul>
-                            <li><strong>Periodo:</strong> {g.periodo}</li>
+                            <li><strong >Periodo:</strong> {g.periodo}</li>
                             <li><strong>Rubros:</strong></li>
                             <ul>
                                 {g.rubros.map((r, j) => (
@@ -272,7 +293,7 @@ const RubrosEvaluacionStep = () => {
             </div>
             <Button 
                 label="Guardar Configuración" 
-                style={{ marginTop: '20px' }}
+                style={{ marginTop: '20px', fontSize: '20px' }}
                 icon="pi pi-save" 
                 className="p-button-success mt-4" 
                 onClick={guardarDatos} 

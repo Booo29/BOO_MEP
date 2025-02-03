@@ -100,10 +100,51 @@ const GetMateriasByCiclo = (req, res) => {
 };
 
 
+const GetMateriasByGradoSeccion = (req, res) => {
+    const { GradoSeccionId } = req.query;
+
+    // Validar que el parámetro haya sido proporcionado
+    if (!GradoSeccionId) {
+        return res.status(400).send("Se requiere el parámetro GradoSeccionId.");
+    }
+
+    // Consulta SQL
+    const query = `
+        SELECT 
+            m.Mat_Id,
+            m.Mat_Nombre,
+            mgs.Mat_gra_sec_Id
+        FROM 
+            materia_grado_seccion mgs
+        INNER JOIN 
+            materias m ON mgs.Materias_Mat_Id = m.Mat_Id
+        WHERE 
+            mgs.Grado_Seccion_Id_Grado_Seccion = ?
+    `;
+
+    // Ejecutar la consulta
+    connection.query(query, [GradoSeccionId], (err, results) => {
+        if (err) {
+            console.error("Error al obtener las materias:", err);
+            return res.status(500).send("Error al obtener las materias.");
+        }
+
+        // Verificar si se encontraron resultados
+        if (results.length === 0) {
+            return res.status(404).send("No se encontraron materias para el Grado_Seccion_Id_Grado_Seccion proporcionado.");
+        }
+
+        // Enviar la respuesta con los resultados
+        res.status(200).json(results);
+    });
+};
+
+
 app.get("/materia", GetMaterias);
 app.post("/materia", PostMateria);
 app.put("/materia", PutMateria);
 app.delete("/materia/:idMateria", DeleteMateria);
 app.get("/materia/ciclo/:cicloId", GetMateriasByCiclo);
+app.get("/materia/seccion", GetMateriasByGradoSeccion);
 
 module.exports = app;
