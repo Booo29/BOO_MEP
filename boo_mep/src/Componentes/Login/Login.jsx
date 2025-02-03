@@ -36,8 +36,7 @@ const Login = () => {
             }
             else{
                 const cookies = new Cookies();   
-                cookies.set('token', res.data.token, { path: '/' });  
-                console.log("Nueva pagina");       
+                cookies.set('token', res.data.token, { path: '/' });      
                 navigate('/InstitucionesPage');
             }
         }

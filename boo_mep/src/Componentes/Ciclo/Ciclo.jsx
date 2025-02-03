@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
+import { Calendar } from "primereact/calendar";
 import { Column } from "primereact/column";
 import { getCiclos, postCiclo, putCiclo, deleteCiclo } from "../../Servicios/CicloService";
 
@@ -14,7 +15,6 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
 
-  console.log("CiclosManager");
 
   useEffect(() => {
     if (idInstitucion) {
@@ -25,7 +25,6 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
   const fetchCiclos = async () => {
     try {
       const data = await getCiclos(idInstitucion);
-      console.log("Ciclos:", data);
       setCiclos(data.map((ciclo) => ({
         id: ciclo.Cic_Id || 0,
         fechaInicio: ciclo.Cic_Fecha_Inicio || "",
@@ -82,7 +81,6 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
 
     try {
       if (selectedCiclo) {
-        console.log("Updating ciclo:", cicloData);
       
         await putCiclo(cicloData);
       } else {
@@ -131,11 +129,11 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
           <form onSubmit={(e) => { e.preventDefault(); handleSaveCiclo(); }}>
             <div className="p-field">
               <label htmlFor="fechaInicio">Fecha de Inicio</label>
-              <input id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
+              <Calendar id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
             </div>
             <div className="p-field">
               <label htmlFor="fechaFin">Fecha de Fin</label>
-              <input id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
+              <Calendar id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
             </div>
             <Button label="Guardar" type="submit" />
           </form>

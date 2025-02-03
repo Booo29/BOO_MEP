@@ -156,7 +156,6 @@ const RubrosEvaluacionStep = () => {
                 Rub_Grado: d.grado,
                 Rub_Materia: d.materia
             }));
-            console.log(payload);
             postRubrosConfigurados(payload);
             Swal.fire({
                 icon: "success",
@@ -274,7 +273,9 @@ const RubrosEvaluacionStep = () => {
                 </div>
                 <Button label="Agregar" icon="pi pi-check" style={{fontSize: "20px"}} onClick={agregarRubro} />
             </Dialog>
-            <Button label="Insertar" icon="pi pi-plus" className="p-button-success mb-4" onClick={insertarDatos} />
+            
+            <Button label="Insertar" icon="pi pi-plus" severity="info" onClick={insertarDatos} />
+
             <h2 style={{fontSize: "25px", fontWeight: "bold"}}>Datos Insertados</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.values(grupos).map((g, i) => (

@@ -56,7 +56,6 @@ const CrearEvaluacion = () => {
                 Eva_Puntos: evaluacion.puntos,
                 Periodo_idPeriodo: periodoId
             };
-            console.log(nuevaEvaluacion);
             const response = await PostEvaluaciones(nuevaEvaluacion);
             
             Swal.fire({

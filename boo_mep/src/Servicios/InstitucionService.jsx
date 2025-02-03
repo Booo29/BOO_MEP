@@ -56,7 +56,6 @@ export const deleteInstitucion = async (idInstitucion) => {
 }
 
 export const postInstitucionConMaterias = async (datos) => {
-    console.log("Datos a guardar service", datos);
     try {
         const response = await axios.post('http://localhost:3000/institucionConMaterias', datos);
         return response.data;

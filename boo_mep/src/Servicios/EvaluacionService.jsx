@@ -57,7 +57,6 @@ export const PostIndicadores = async (data) => {
 
 export const PostEvaluaciones = async (data) => {
     try {
-        console.log("Service fronted: ", data);
         const response = await axios.post('http://localhost:3000/evaluaciones', data);
         return response.data;
 

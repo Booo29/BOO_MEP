@@ -15,8 +15,6 @@ const MateriasStep = () => {
   const [searchAvailable, setSearchAvailable] = useState("");
   const [searchSelected, setSearchSelected] = useState("");
 
-  console.log('institutionId', institutionId);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -79,7 +77,6 @@ const MateriasStep = () => {
         // setAvailableMaterias([...availableMaterias, materia]);
         // setSelectedMaterias(selectedMaterias.filter((m) => m.id !== materia.id));
         try {
-            console.log('materiaId', materiaId);
             await deleteMateriaInstitucion(materiaId);
             Swal.fire({
                 title: "Eliminado",

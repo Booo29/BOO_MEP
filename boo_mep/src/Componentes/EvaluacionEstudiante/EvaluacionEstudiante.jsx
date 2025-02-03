@@ -37,8 +37,6 @@ const EvaluacionEstudiante = () => {
   useEffect(() => {
     const fetchData = async () => {
         try{
-            console.log("Ciclo ", cicloId);
-            console.log("Institucion ", institutionId);
             const grados = await getGradoSecciones(cicloId, institutionId);
             setSecciones(
                 grados.map((grado) => ({
@@ -67,9 +65,6 @@ const EvaluacionEstudiante = () => {
 
   useEffect(() => {
     if (selectedMateria) {
-        console.log("Materia ", selectedMateria);
-        console.log("Seccion ", selectedSeccion.Gra_Nombre);
-        console.log("Periodo ", periodoId);
       const fetchData = async () => {
         try{
             const evaluaciones = await GetEvaluaciones(
@@ -77,7 +72,6 @@ const EvaluacionEstudiante = () => {
                 selectedSeccion.Gra_Nombre,
                 periodoId
             );
-            console.log("Evaluaciones ", evaluaciones);
             setEvaluaciones(evaluaciones);
         }
         catch(error){
@@ -97,7 +91,7 @@ const EvaluacionEstudiante = () => {
                 selectedMateria.Mat_Id,
                 selectedEvaluacion.Eva_Id,
             );
-            console.log("Notas ", notas);
+           
             setEstudiantes(notas);
         }
         catch(error){
@@ -160,19 +154,19 @@ const applyGlobalValues = () => {
                 Materia_grado_seccion_Mat_gra_sec_Id: selectedMateria.Mat_gra_sec_Id,
             };
             if (est.EvaEst_Id) {
-                console.log("Se actualiza : ", data);
+                
                 NotaActualizada.push({...data, EvaEst_Id: est.EvaEst_Id});
             } else {
-                console.log("Se crea : ", data);
+               
                 notaNueva.push(data);
             }
         });
         if(notaNueva.length > 0){
-            console.log("Notas Nuevas ", notaNueva);
+            
             postEstudianteNota(notaNueva);
         }
         if(NotaActualizada.length > 0){
-            console.log("Notas Actualizadas ", NotaActualizada);
+
             putEstudianteNota(NotaActualizada);
         }
         Swal.fire({
@@ -194,21 +188,12 @@ const applyGlobalValues = () => {
         
   };
 
+
   const handleMenu = () => {
     navigate('/MenuPage');
   };
 
-
-
-//   const applyGlobalValues = () => {
-//     setEstudiantes((prevEstudiantes) =>
-//       prevEstudiantes.map((est) => ({
-//         ...est,
-//         EvaEst_PuntosObtenidos: notaGlobal,
-//         EvaEst_PorcentajeObtenido: porcentajeGlobal,
-//       }))
-//     );
-//   };
+  
 
   return (
     <div style={{ padding: "16px" }} >
@@ -281,7 +266,7 @@ const applyGlobalValues = () => {
 
       <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
 
-      <DataTable value={estudiantes} editMode="cell" stripedRows >
+      <DataTable value={estudiantes} editMode="cell" stripedRows emptyMessage="No hay estudiantes para mostrar">
         <Column field="Est_Identificacion" header="Identificacion" />
         <Column field="Est_Nombre" header="Nombre" />
         <Column field="Est_PrimerApellido" header="Primer Apellido" />
@@ -290,15 +275,18 @@ const applyGlobalValues = () => {
         <Column field="Eva_Porcentaje" header="% Evaluación" body={() => selectedEvaluacion?.Eva_Porcentaje} />
         <Column field="Eva_Puntos" header="Puntos Evaluación" body={() => selectedEvaluacion?.Eva_Puntos} />
 
-        <Column field="EvaEst_PorcentajeObtenido" header="% Obtenido" editor={(options) => (
+        <Column field="EvaEst_PorcentajeObtenido" header="% Obtenido"  editor={(options) => (
             <InputNumber 
                 value={options.value}
                 onValueChange={(e) => options.editorCallback(e.value)} 
                 min={0} 
                 max={selectedEvaluacion?.Eva_Porcentaje} 
                 mode="decimal"
+                placeholder="Porcentaje"
             />
-        )} onCellEditComplete={onCellEditComplete} />
+        )} 
+        onCellEditComplete={onCellEditComplete} 
+        />
 
         <Column field="EvaEst_PuntosObtenidos" header="Puntos Obtenidos" editor={(options) => (
             <InputNumber 
@@ -317,6 +305,7 @@ const applyGlobalValues = () => {
                 min={0} 
                 max={100}
                 mode="decimal"
+                
             />
         )} onCellEditComplete={onCellEditComplete} />
                 

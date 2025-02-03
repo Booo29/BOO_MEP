@@ -49,7 +49,6 @@ const InstitucionesView = () => {
 
         try {
             if (datos.idInstitucion) {
-                console.log("Datos a actualizar", datos);
                 await putInstitucion(datos);
                 Swal.fire({
                     title: "Guardado",
@@ -61,7 +60,6 @@ const InstitucionesView = () => {
                 })
             } else {
                 datos.idProfesor = idProfesor;
-                console.log("Datos a guardar", datos);
                 await postInstitucion(datos);
                 Swal.fire({
                     title: "Guardado",
@@ -121,9 +119,11 @@ const InstitucionesView = () => {
     return (
         <div className="instituciones-container">
             <h1 className="main-title">Ingreso de Instituciones y Ciclos</h1>
+            <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
             <p className="description">
                 Aquí puede gestionar las instituciones donde trabaja. Puede agregar, editar o eliminar instituciones y gestionar los ciclos relacionados.
             </p>
+            <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
             <Button
                 label="Agregar Institución"
                 icon="pi pi-plus"

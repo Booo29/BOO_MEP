@@ -17,7 +17,6 @@ const AddInstitucionDialog = ({ visible, onHide, onSave, institucion }) => {
 
     useEffect(() => {
         if (institucion) {
-            console.log("Institucion dialog", institucion);
             setFormData({
                 idInstitucion: institucion.Inst_Id,
                 nombre: institucion.Inst_Nombre || "",

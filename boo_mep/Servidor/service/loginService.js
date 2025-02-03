@@ -97,7 +97,7 @@ const PostRegister = (req, res) => {
 
 const PutPassword = (req, res) => {
     const { userId, password } = req.body;
-    console.log("datos", userId, password);
+    
     if (userId && password) {
         const salt = bcrypt.genSaltSync(10);
         const hash = bcrypt.hashSync(password, salt);
@@ -106,7 +106,6 @@ const PutPassword = (req, res) => {
                 console.log(err);
                 return res.status(500).send("Error al actualizar contraseña");
             } else {
-                console.log("resultadito", results);
                 return res.status(200).send("Contraseña actualizada");
             }
         });

@@ -12,6 +12,7 @@ import EvaluacionesStepFormPage from "./Paginas/EvaluacionesStepFormPage";
 import EvaluacionEstudiantePage from "./Paginas/EvaluacionEstudiantePage";
 import ListasPage from "./Paginas/ListasPage";
 import InformesPage from "./Paginas/InformesPage";
+import TutorialesPage from "./Paginas/TutorialesPage";
 
 export function App() {
   return (
@@ -30,6 +31,7 @@ export function App() {
           <Route path="/EvaluacionEstudiantePage" element={<EvaluacionEstudiantePage />} />
           <Route path="/ListasPage" element={<ListasPage />} />
           <Route path="/InformesPage" element={<InformesPage />} />
+          <Route path="/TutorialesPage" element={<TutorialesPage />} />
           
 
           <Route path="*" element={<Navigate to="/" replace />} />

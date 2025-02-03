@@ -45,6 +45,7 @@
     padding: 15px;
     margin-top: 1rem;
     cursor: pointer;
+    width: 100%;
 }
 
 .button-institucion:hover {

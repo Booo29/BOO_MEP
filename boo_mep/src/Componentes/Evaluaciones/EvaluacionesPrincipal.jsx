@@ -42,8 +42,6 @@ const EvaluacionesPrincipal = () => {
                 ))
             );
 
-            console.log("Grados unicos", gradosUnicos);
-
             setGrados(gradosUnicos.map((grado) => ({
                 label: grado.Gra_Nombre,
                 value: { id: grado.Id_Grado_Seccion, nombre: grado.Gra_Nombre }
@@ -58,7 +56,6 @@ const EvaluacionesPrincipal = () => {
     const fetchMaterias = async () => {
       if (selectedGrado) {
         try {
-          console.log("Materias ", selectedGrado);
           const response = await GetMateriasByGradoSeccion(selectedGrado.id);
           setMaterias(
             response.map((mat) => ({
@@ -76,7 +73,6 @@ const EvaluacionesPrincipal = () => {
    
     useEffect(() => {
         if (selectedGrado && selectedMateria) {
-            console.log("Grado y materia seleccionados", selectedGrado, selectedMateria);
             GetEvaluaciones(selectedMateria.nombre, selectedGrado.nombre, periodoId).then(data => {
                 setEvaluaciones(data);
             });
@@ -136,7 +132,7 @@ const EvaluacionesPrincipal = () => {
                 disabled={!selectedGrado || !selectedMateria}
             />
     
-            <DataTable value={evaluaciones}>
+            <DataTable value={evaluaciones} emptyMessage="No hay evaluaciones registradas" stripedRows>
                 <Column field="Eva_Nombre" header="Nombre" />
                 <Column field="Eva_Puntos" header="Puntos" />
                 <Column field="Eva_Porcentaje" header="Porcentaje" />

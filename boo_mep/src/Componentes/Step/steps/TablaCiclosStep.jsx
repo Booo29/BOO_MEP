@@ -22,8 +22,6 @@ const TablaCiclosStep = () => {
 
   const idInstitucion = useStore((state) => state.institutionId);
 
-  console.log("CiclosManager");
-
   useEffect(() => {
     if (idInstitucion) {
       fetchCiclos();
@@ -33,7 +31,6 @@ const TablaCiclosStep = () => {
   const fetchCiclos = async () => {
     try {
       const data = await getCiclos(idInstitucion);
-      console.log("Ciclos:", data);
       setCiclos(data);
     } catch (error) {
       console.error("Error fetching ciclos:", error);

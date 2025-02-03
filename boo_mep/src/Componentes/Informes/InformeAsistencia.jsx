@@ -5,6 +5,7 @@ import { Button } from 'primereact/button';
 import { Calendar } from "primereact/calendar";
 import Cookies from 'universal-cookie';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
 import {GenerarDocumento} from './GenerarDocumento';
 
@@ -18,6 +19,8 @@ import useStore from "../../store/store";
 import usePeriodoStore from "../../store/PeriodoStore";
 
 const InformeAsistencia = () => {
+
+  const navigate = useNavigate();
 
   const cookies = new Cookies();  
 
@@ -55,11 +58,9 @@ const InformeAsistencia = () => {
   }, []);
 
   useEffect(() => {
-    console.log('selectedSeccion', selectedSeccion);
     if(selectedSeccion){
       const fetchEstudiantes = async () => {
         try{
-          console.log('selectedSeccion', selectedSeccion);
           const estudiantes = await getEstudiantes(cicloId, selectedSeccion);
           setEstudiantes(
             estudiantes.map((estudiante) => ({
@@ -79,10 +80,6 @@ const InformeAsistencia = () => {
   const handleReportGeneration = async () => {
 
     if(selectedReportType === 'InformeAsistenciaGrupal'){
-      console.log('Seccion', secciones.find((seccion) => seccion.value === selectedSeccion).label);
-      console.log('Institucion', institucion.Inst_Nombre);
-
-
       const informe = await GetInformeAsistenciaSeccion(selectedSeccion, startDate.toISOString().split("T")[0], endDate.toISOString().split("T")[0]);
       const datosInforme = {
         fechaHoy : new Date().toISOString().split("T")[0],
@@ -182,60 +179,95 @@ const InformeAsistencia = () => {
 
   };
 
-  return (
-    <div>
-      <Dropdown 
-        value={selectedReportType} 
-        options={[
-          { label: 'Informe de Asistencia Grupal', value: 'InformeAsistenciaGrupal' },
-          { label: 'Informe de Asistencia Individual', value: 'InformeAsistenciaIndividual' },
-          { label: 'Informe de Notas Grupal', value: 'InformeNotasGrupal' },
-          { label: 'Informe de Notas Individual', value: 'InformeNotasIndividual' },
-        ]}
-        onChange={(e) => setSelectedReportType(e.value)}
-        placeholder="Seleccione tipo de informe"
-      />
+  const handleMenu = () => {
+    navigate('/MenuPage');
+  };
 
+
+  return (
+    <div style={{ padding: "16px" }} >
+      <Button label="Regresar" severity="help" onClick={handleMenu} />
+      <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>Creador de informes</h1>
+      <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
+        <div style={{ flex: 1 }}> 
+          <Dropdown 
+            value={selectedReportType} 
+            options={[
+              { label: 'Informe de Asistencia Grupal', value: 'InformeAsistenciaGrupal' },
+              { label: 'Informe de Asistencia Individual', value: 'InformeAsistenciaIndividual' },
+              { label: 'Informe de Notas Grupal', value: 'InformeNotasGrupal' },
+              { label: 'Informe de Notas Individual', value: 'InformeNotasIndividual' },
+            ]}
+            onChange={(e) => setSelectedReportType(e.value)}
+            placeholder="Seleccione tipo de informe"
+            style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
+          />
+        </div>
+      </div>
       {selectedReportType && (
-        <>
+        <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
+        <div style={{ flex: 1 }}> 
           <Dropdown 
             value={selectedSeccion} 
             options={secciones} 
             onChange={(e) => setSelectedSeccion(e.value)} 
             placeholder="Seleccione sección" 
+            style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
           />
-          
+        </div>
+      </div>
+      )}
+
           {(selectedReportType === 'InformeAsistenciaIndividual' || selectedReportType === 'InformeNotasIndividual') && (
-            <Dropdown 
-              value={selectedEstudiante} 
-              options={estudiantes} 
-              onChange={(e) => setSelectedEstudiante(e.value)} 
-              placeholder="Seleccione estudiantes"
-              filter
-            />
+            <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
+            <div style={{ flex: 1 }}>
+              <Dropdown 
+                value={selectedEstudiante} 
+                options={estudiantes} 
+                onChange={(e) => setSelectedEstudiante(e.value)} 
+                placeholder="Seleccione estudiantes"
+                filter
+                style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
+              />
+            </div>
+          </div>
           )}
 
           {(selectedReportType === 'InformeAsistenciaGrupal' || selectedReportType === 'InformeAsistenciaIndividual') && (
-            <div>
+            <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
+       
+            <div style={{ flex: 1 }}>
               <Calendar 
                 value={startDate} 
                 onChange={(e) => setStartDate(e.value)} 
                 placeholder="Fecha de inicio" 
-                showIcon 
+                style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}      
               />
+            </div>
+
+            <div style={{ flex: 1 }}>
               <Calendar 
                 value={endDate} 
                 onChange={(e) => setEndDate(e.value)} 
                 placeholder="Fecha de fin" 
-                showIcon 
+                style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}    
               />
             </div>
+          </div>
           )}
 
-          <Button label="Generar Informe" onClick={handleReportGeneration} />
-        </>
-      )}
-    </div>
+          <div>
+            <Button 
+              label="Generar Informe" 
+              severity="success"
+              style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}    
+              onClick={handleReportGeneration} 
+              disabled={!selectedReportType || !selectedSeccion || !startDate || !endDate || (selectedReportType === 'InformeAsistenciaIndividual' && !selectedEstudiante)}
+            />
+          </div>
+      </div>
+    
+
   );
 };
 

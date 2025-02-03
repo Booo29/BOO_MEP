@@ -50,7 +50,7 @@ const Menu = () => {
             nombre: "Tutoriales",
             imagen: Tutoriales,           
             color: "#E262E8",
-            onClick: () => navigate("/MenuTutorialesPage"),
+            onClick: () => navigate("/TutorialesPage"),
         },
 
     ];

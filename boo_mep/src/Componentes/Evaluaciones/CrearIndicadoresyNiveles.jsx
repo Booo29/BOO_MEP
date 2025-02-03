@@ -75,7 +75,6 @@ const CrearIndicadoresyNiveles = () => {
     };
 
     const handleCreateNivel = () => {
-        console.log("Crear nivel: ", nuevoNivel);
         const data = {
             Niv_Nivel: nuevoNivel.nivel,
             Niv_Puntos: nuevoNivel.puntos,
@@ -121,7 +120,7 @@ const CrearIndicadoresyNiveles = () => {
                 <Button label="Crear Indicador" onClick={() => setVisibleIndicador(true)} />
                 <Button label="Crear Nivel de Desempeño" onClick={() => setVisibleNivel(true)} />
             </div>
-            <DataTable value={tableData} style={{ marginTop: '20px' }}>
+            <DataTable value={tableData} style={{ marginTop: '20px' }} emptyMessage="No hay indicadores ingresados" stripedRows>
                 <Column field="Ind_Nombre" header="Nombre del Indicador" />
                 <Column field="selectedNiveles" header="Niveles de Desempeño" body={rowData => (
                     <MultiSelect value={rowData.selectedNiveles} options={nivelesDesempeno} onChange={(e) => handleNivelSelect(e, rowData)} optionLabel="Niv_Nivel" placeholder="Selecciona Niveles" />

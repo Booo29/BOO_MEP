@@ -6,9 +6,6 @@ const { connection } = require("../config");
 
 const GetEstudiantesNotas = (req, res) => {
     const { materiaGradoSeccionId, materiaId, evaluacionId } = req.query;
-    console.log("materiaGradoSeccionId ", materiaGradoSeccionId);
-    console.log("materiaId ", materiaId);
-    console.log("evaluacionId ", evaluacionId);
     try {
         const query = `
             SELECT 
@@ -42,7 +39,6 @@ const GetEstudiantesNotas = (req, res) => {
                     console.error("Error al obtener estudiantes y notas:", err);
                     return res.status(500).send("Error al obtener datos.");
                 }
-                console.log("results ", results);
 
                 res.status(200).json(results);
             }

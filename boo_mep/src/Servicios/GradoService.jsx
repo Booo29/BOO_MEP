@@ -14,7 +14,6 @@ export const getGrados = async () => {
 export const postGrado = async (datos) => {
     try {
         const response = await axios.post('http://localhost:3000/grados', datos);
-        console.log("Response desde service cliente", response);
         return response.data;
 
     } catch (error) {

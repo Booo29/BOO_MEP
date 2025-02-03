@@ -129,8 +129,6 @@ const IngresoEstudiantesStep = () => {
       Grado_Seccion_Id_Grado_Seccion: selectedSeccion,
     }));
 
-    console.log("guardado ", payload);
-
     postEstudiantes(payload)
       .then(() => {
         Swal.fire({
@@ -153,6 +151,17 @@ const IngresoEstudiantesStep = () => {
       });
   };
 
+  
+  const DescargarPlantillaExcel = () => {
+    const fileUrl = "/plantillas/PlantillaEstudiantes.xlsx"; // Asegúrate de que el archivo esté en la carpeta public
+    const link = document.createElement("a");
+    link.href = fileUrl;
+    link.download = "Plantilla_Lista.xlsx"; // Nombre del archivo al descargar
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 
   const studentDialogFooter = (
     <Button label="Guardar" icon="pi pi-check" onClick={saveStudent} />
@@ -169,7 +178,16 @@ const IngresoEstudiantesStep = () => {
                       options={secciones}
                       onChange={(e) => setSelectedSeccion(e.value)}
                       placeholder="Seleccione una sección"
-                      style={{ width: "50%", fontSize: '16px', fontWeight: 'bold' }}
+                      style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
+                  />
+              </div>
+               <div style={{ flex: 1 }}>
+                  <Button
+                  label="Descargar Plantilla"
+                  icon="pi pi-download"
+                  className="p-ml-3"
+                  onClick={DescargarPlantillaExcel}
+                  style={{ width: "100%", fontSize: '16px', fontWeight: 'bold', background: '#99ed63', color: 'black', borderColor: '#99ed63' }}
                   />
               </div>
           </div>

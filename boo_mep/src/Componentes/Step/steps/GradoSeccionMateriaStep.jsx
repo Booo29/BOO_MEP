@@ -75,7 +75,6 @@ const GradoSeccionMateriaStep = () => {
 
     const GuardarGradoSeccionMateria = async (asignaciones) => {
         try {
-            console.log("Asignaciones:", asignaciones);
             await postGradoSeccionMateria(asignaciones);
             Swal.fire({
                 icon: "success",
@@ -155,7 +154,7 @@ const GradoSeccionMateriaStep = () => {
                 <Button
                     label="Asignar a Todos"
                     icon="pi pi-check"
-                    className="p-button-success mt-2"
+                    severity="info"
                     style={{ marginLeft: "10px" }}
                     onClick={handleAsignarTodas}
                 />

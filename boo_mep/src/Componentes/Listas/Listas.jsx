@@ -57,7 +57,6 @@ const Listas = () => {
 
     useEffect(() => {
         if (selectedSeccion) {
-            console.log("selectedSeccion", selectedSeccion);
             getEstudiantes(cicloId, selectedSeccion)
                 .then((response) => {
                     const formattedStudents = response.map((student) => ({
@@ -98,7 +97,6 @@ const Listas = () => {
             student.Est_Id === studentData.Est_Id ? { ...studentData, Est_Id: student.Est_Id } : student
           )
         );
-        console.log("studentData", studentData);
         putEstudiante(studentData.Est_Id, studentData)
         .then(() => {
             Swal.fire({
@@ -150,7 +148,6 @@ const Listas = () => {
             cancelButtonText: "Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log("studentId", studentId);
                 setEstudiantes((prev) => prev.filter((student) => student.Est_Id !== studentId));
                 deleteEstudiante(studentId)
                 .then(() => {
@@ -218,38 +215,43 @@ const Listas = () => {
       reader.readAsArrayBuffer(file);
 
     };
-  
-    // const saveAllStudents = () => {
-  
-    //   const payload = estudiantes.map((student) => ({
-    //     Est_Identificacion: student.Est_Identificacion,
-    //     Est_Nombre: student.Est_Nombre,
-    //     Est_PrimerApellido: student.Est_PrimerApellido,
-    //     Est_SegundoApellido: student.Est_SegundoApellido,
-    //     Grado_Seccion_Id_Grado_Seccion: selectedSeccion,
-    //   }));
-  
-    //   postEstudiantes(payload)
-    //     .then(() => {
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: "Estudiantes guardados",
-    //         text: "Los estudiantes han sido guardados exitosamente.",
-    //         timer: 2000,
-    //         showConfirmButton: false,
-    //     });
-    //       setEstudiantes([]);
-    //     })
-    //     .catch(() => {
-    //       Swal.fire({
-    //         icon: "error",
-    //         title: "Error al guardar estudiantes",
-    //         text: "Ocurrió un error al guardar los estudiantes. Por favor, intente de nuevo.",
-    //         timer: 2000,
-    //         showConfirmButton: false,
-    //       });
-    //     });
-    // };
+
+    const DescargarPlantillaExcel = () => {
+        const fileUrl = "/plantillas/PlantillaEstudiantes.xlsx"; 
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = "Plantilla_Lista.xlsx"; 
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const DescargarPlantillaExcelConDatos = () => {
+        // Crear una hoja de cálculo con los datos de los estudiantes
+        const nuevoFormato = estudiantes.map((estudiante) => ({
+            Identificacion: estudiante.Est_Identificacion,
+            'Primer Nombre': estudiante.Est_Nombre,
+            'Primer Apellido': estudiante.Est_PrimerApellido,
+            'Segundo Apellido': estudiante.Est_SegundoApellido,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(nuevoFormato);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Estudiantes");
+    
+        // Generar el archivo Excel y crear un enlace para su descarga
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    
+        // Crear un enlace para descargar el archivo
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `ListaEstudiantes_${secciones.find((seccion) => seccion.value === selectedSeccion).label}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+    
 
     const handleMenu = () => {
         navigate('/MenuPage');
@@ -272,9 +274,20 @@ const Listas = () => {
                         options={secciones}
                         onChange={(e) => setSelectedSeccion(e.value)}
                         placeholder="Seleccione una sección"
-                        style={{ width: "50%", fontSize: '16px', fontWeight: 'bold' }}
+                        style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
                     />
                 </div>
+                <div style={{ flex: 1 }}>
+                    <Button
+                        label="Descargar Plantilla"
+                        icon="pi pi-download"
+                        className="p-ml-3"
+                        onClick={DescargarPlantillaExcel}
+                        style={{ width: "100%", fontSize: '16px', fontWeight: 'bold', background: '#99ed63', color: 'black', borderColor: '#99ed63' }}
+                        severity="info"
+                    />
+                </div>
+
             </div>
     
             <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
@@ -299,6 +312,17 @@ const Listas = () => {
                         disabled={!selectedSeccion}
                     />
                 </div>
+                <div style={{ flex: 1 }}>
+                    <Button
+                        label="Descargar Lista"
+                        icon="pi pi-download"
+                        className="p-ml-3"
+                        onClick={DescargarPlantillaExcelConDatos}
+                        style={{ width: "100%", fontSize: '16px', fontWeight: 'bold', background: '#33b29f', borderColor: '#33b29f' }}
+                        severity="info"
+                        disabled={!selectedSeccion}
+                    />
+                </div>
             </div>
             <div style={{ flex: 1 }}>
                 <input
@@ -310,7 +334,7 @@ const Listas = () => {
                 />
             </div>
     
-            <DataTable value={estudiantes} className="p-mt-3" stripedRows >
+            <DataTable value={estudiantes} className="p-mt-3" stripedRows emptyMessage="No hay estudiantes para mostrar">
             <Column field="Est_Identificacion" header="Identificación" />
             <Column field="Est_Nombre" header="Nombre" />
             <Column field="Est_PrimerApellido" header="Primer Apellido" />
@@ -333,15 +357,6 @@ const Listas = () => {
                 header="Acciones"
             />
             </DataTable>
-    
-            {/* <Button
-            label="Guardar Estudiantes"
-            icon="pi pi-save"
-            className="p-mt-3"
-            style={{ marginTop: "20px" }}
-            onClick={saveAllStudents}
-            severity="success"
-            /> */}
     
             <Dialog
             visible={dialogVisible}

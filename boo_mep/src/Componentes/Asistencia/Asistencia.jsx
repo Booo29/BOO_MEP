@@ -39,12 +39,11 @@ const Asistencia = () => {
 
   const toast = React.useRef(null);
 
-  // Cargar secciones al iniciar el componente
+  
   useEffect(() => {
     const fetchSecciones = async () => {
       try {
         const response = await getGradoSecciones(cicloId, institutionId);
-        console.log("Secciones ", response);
         setSecciones(
           response.map((sec) => ({
             label: `${sec.Gra_Nombre} - ${sec.Gra_Sec_Nombre}`,
@@ -58,12 +57,11 @@ const Asistencia = () => {
     fetchSecciones();
   }, []);
 
-  // Cargar materias cuando se selecciona una sección
+ 
   useEffect(() => {
     const fetchMaterias = async () => {
       if (seccion) {
         try {
-          console.log("Materias ", seccion);
           const response = await GetMateriasByGradoSeccion(seccion);
           setMaterias(
             response.map((mat) => ({
@@ -170,12 +168,10 @@ const Asistencia = () => {
     }, [materia, fecha]);
 
   const handleEstadoChange = (id, estado) => {
-    console.log("Id ", id);
-    console.log("Estado ", estado);
     const nuevosEstudiantes = estudiantes.map((est) =>
       est.id === id ? { ...est, estado } : est
     );
-    console.log("Estado ", nuevosEstudiantes);
+    
     setEstudiantes(nuevosEstudiantes);
   };
 
@@ -210,9 +206,9 @@ const Asistencia = () => {
         Estudiantes_Est_Id: est.idEstudiante,
         Periodo_Per_Id: periodoId, 
       };
-      console.log("Asissstencia ", asistencias);
+
       if (est.asistenciaId) {
-        console.log("Asistencia id ", est.asistenciaId);
+
         asistenciasActualizar.push({ ...payload, Asi_Id: est.asistenciaId });
       }
       else {
@@ -221,12 +217,12 @@ const Asistencia = () => {
     });
 
     if (asistenciasNuevas.length > 0) {
-      console.log("Asistencias nuevas ", asistenciasNuevas);
+
       await postAsistencia(asistenciasNuevas);
     }
 
     if (asistenciasActualizar.length > 0) {
-      console.log("Asistencias actualizar ", asistenciasActualizar);
+
        await putAsistencia(asistenciasActualizar);
     }
       toast.current.show({
@@ -314,7 +310,7 @@ const Asistencia = () => {
           />
         </div>
 
-        <DataTable value={estudiantes} className="p-mt-4" stripedRows >
+        <DataTable value={estudiantes} className="p-mt-4" stripedRows emptyMessage="No hay estudiantes para mostrar">
           <Column field="nombre" header="Nombre" />
           <Column
             field="estado"

@@ -45,7 +45,6 @@ const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
     , [institucion.Inst_Id]);
 
     useEffect(() => {
-        console.log("selectedCiclo", selectedCiclo);
         if (selectedCiclo) {
             const filteredPeriodos = ciclos
                 .filter((c) => c.cicloId === selectedCiclo.cicloId)
@@ -57,7 +56,6 @@ const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
                 }));
             
             const periodos = filteredPeriodos[0].datos;
-            console.log("periodos", periodos);
             setPeriodos(periodos);
         } else {
             setPeriodos([]);
@@ -66,11 +64,9 @@ const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
 
     const handleAccept = () => {
         if (selectedCiclo && selectedPeriodo) {
-            console.log("selectedPeriodo", selectedPeriodo);
             setInstitutionId(institucion.Inst_Id);
             setCicloId(selectedCiclo.cicloId);
             setPeriodoId(selectedPeriodo.periodoId);
-            console.log("selectedCiclo", selectedCiclo);
             navigate('/MenuPage'); 
         } else {
             alert("Debe seleccionar un ciclo y un periodo.");
@@ -84,10 +80,10 @@ const InstitucionCard = ({ institucion, onDelete, onEdit}) => {
             <p><strong>Dirección Regional:</strong> {institucion.Inst_DireccionRegional}</p>
             <p><strong>Circuito:</strong> {institucion.Inst_Circuito}</p>
             <div className="card-actions">
-                <Button label="Ingresar" icon="pi pi-calendar" className="p-button-primary" severity="success" onClick={() => setDialogVisible(true)}  />
+                <Button label="Ingresar" icon="pi pi-home" className="p-button-primary" severity="success" onClick={() => setDialogVisible(true)}  />
                 <Button label="Editar Institución" icon="pi pi-pencil" className="p-button-info" severity="info" onClick={onEdit} />
                 <Button label="Ingresar Ciclo" icon="pi pi-calendar" className="p-button-help" severity="help" onClick={handleAddCiclo} />
-                <Button label="Ciclos anteriores" icon="pi pi-calendar" className="p-button-warning" severity="warning" />
+                {/* <Button label="Ciclos anteriores" icon="pi pi-calendar" className="p-button-warning" severity="warning" /> */}
                 <Button label="Eliminar" icon="pi pi-trash" className="p-button-danger" severity="danger" onClick={onDelete} />
             </div>
             <Dialog

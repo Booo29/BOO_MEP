@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { ListBox } from "primereact/listbox";
+import { Calendar } from "primereact/calendar";
 import { postCiclo } from "../../../Servicios/CicloService";
 import useStore from "../../../store/store";
 import useCicloStore from "../../../store/CicloStore";
@@ -8,8 +9,8 @@ import Swal from "sweetalert2";
 
 const CiclosStep = () => {
   
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
+  const [fechaInicio, setFechaInicio] = useState(null);
+  const [fechaFin, setFechaFin] = useState(null);
 
   const [numPeriodos, setNumPeriodos] = useState(0); 
   const [periodos, setPeriodos] = useState([]);
@@ -28,13 +29,14 @@ const CiclosStep = () => {
         }));
     
         const cicloData = {
-          fechaInicio,
-          fechaFin,
-          idInstitucion,
-          periodos,
+          fechaInicio: fechaInicio.toISOString().split("T")[0],
+          fechaFin: fechaFin.toISOString().split("T")[0],
+          idInstitucion: idInstitucion,
+          periodos: periodos,
         };
+
         const response = await postCiclo(cicloData);
-        console.log("response", response);
+        
         const cicloId = response.cicloId;
         setCicloId(cicloId);
         Swal.fire({
@@ -74,11 +76,27 @@ const CiclosStep = () => {
           <form onSubmit={(e) => { e.preventDefault()}}>
             <div className="p-field">
               <label htmlFor="fechaInicio" style={{fontWeight: "bold", fontSize: "25px"}}>Fecha de Inicio</label>
-              <input id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required style={{fontSize: "20px"}} />
+              <Calendar 
+                id="fechaInicio" 
+                type="date"  
+                value={fechaInicio} 
+                onChange={(e) => setFechaInicio(e.target.value)} 
+                required 
+                style={{fontSize: "20px", width: "100%"}} 
+                placeholder="Seleccione una fecha de inicio de ciclo"
+              />
             </div>
             <div className="p-field">
               <label htmlFor="fechaFin" style={{fontWeight: "bold", fontSize: "25px"}}>Fecha de Fin</label>
-              <input id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required style={{fontSize: "20px"}}/>
+              <Calendar 
+                id="fechaFin" 
+                type="date"  
+                value={fechaFin} 
+                onChange={(e) => setFechaFin(e.target.value)} 
+                required 
+                style={{fontSize: "20px", width: "100%"}}
+                placeholder="Seleccione una fecha de fin de ciclo"
+              />
             </div>
             <div className="p-field">
               <label htmlFor="periodo" style={{fontWeight: "bold", fontSize: "25px"}}>Cuantos periodos desea que tenga el ciclo</label>
@@ -94,7 +112,7 @@ const CiclosStep = () => {
                 value={null}
               />
             </div>
-            <Button label="Guardar" type="submit" onClick={handleSaveCiclo}/>
+            <Button label="Guardar" type="submit" severity="success" onClick={handleSaveCiclo}/>
           </form>
         </div>
     </div>

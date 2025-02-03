@@ -20,12 +20,10 @@ const GradoSeccionesStep = () => {
 
     const tipos = ["Primaria", "Secundaria", "Otros"];
 
-    // Cargar los grados desde la base de datos
     useEffect(() => {
         const cargarGrados = async () => {
             try {
                 const response = await getGrados();
-                console.log("Grados cargados:", response.data);
                 setGradosDisponibles(response);
             } catch (error) {
                 console.error("Error al cargar los grados:", error);
@@ -85,7 +83,6 @@ const GradoSeccionesStep = () => {
         });
 
         try {
-            console.log("Secciones a guardar:", seccionesAGuardar);
             await postGradoSeccion(seccionesAGuardar);
             Swal.fire({
                 icon: "success",
@@ -117,9 +114,7 @@ const GradoSeccionesStep = () => {
 
     const guardarGrado = async () => {
         try {
-            console.log("Guardando grado:", nuevoGrado);
             const response = await postGrado(nuevoGrado);
-            console.log("Grado guardado:", response.grado);
             setGradosDisponibles([...gradosDisponibles, response.grado]);
             Swal.fire({
                 icon: "success",

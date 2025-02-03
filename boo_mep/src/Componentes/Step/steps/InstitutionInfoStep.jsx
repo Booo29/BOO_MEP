@@ -26,10 +26,8 @@ const InstitutionInfoStep = () => {
 
   useEffect(() => {
     if (institutionId) {
-      console.log('institutionId', institutionId);
       const fetchInstitucion = async () => {
         const institucion = await getInstitucionbyId(institutionId);
-        console.log('institucion', institucion);
         setInstitucion({
           idInstitucion: institucion.Inst_Id,
           nombre: institucion.Inst_Nombre,
@@ -64,10 +62,8 @@ const InstitutionInfoStep = () => {
         })
       } else {
         institucion.idProfesor = idProfesor;
-        console.log('institucion guardar', institucion);
         try {
           const response = await postInstitucion(institucion); 
-          console.log('response.data', response);
           const { Inst_Id } = response; 
           
           setInstitutionId(Inst_Id);
