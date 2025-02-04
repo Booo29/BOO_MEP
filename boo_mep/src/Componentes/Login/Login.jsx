@@ -54,7 +54,7 @@ const Login = () => {
 
   return (
     <div style={{ padding: "16px" }} >
-       <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>EDUPLAN version 1</h1>
+       <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>EDUPLAN version 1.2.0 </h1>
         <div className="login-page" >
           <div className="login-card">
             <div className="login-left">
