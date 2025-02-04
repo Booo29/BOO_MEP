@@ -1,16 +1,11 @@
-const { app, BrowserWindow, dialog, Menu } = require('electron');
-const {autoUpdater} = require("electron-updater");
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 const express = require('express'); 
-// const ProgressBar = require('electron-progressbar');
-// const log = require('electron-log');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
 
-let updateCheck = false;
-let updateFound = false;
-let updateNotAvailable = false;
 
 function startExpressServer() {
   const expressApp = express();
@@ -52,6 +47,8 @@ async function startBackend() {
   });
 }
 
+
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -72,6 +69,19 @@ function createWindow() {
   });
 }
 
+function checkForUpdates() {
+  autoUpdater.autoDownload = true; // Descarga automáticamente las actualizaciones
+  autoUpdater.checkForUpdatesAndNotify(); // Verifica actualizaciones
+}
+
+autoUpdater.on('update-available', () => {
+  console.log('Nueva actualización disponible. Descargando...');
+});
+
+autoUpdater.on('update-downloaded', () => {
+  console.log('Actualización descargada. Se instalará al cerrar.');
+  autoUpdater.quitAndInstall();
+});
 
 
 app.whenReady().then(() => {
@@ -82,8 +92,7 @@ app.whenReady().then(() => {
 
   createWindow();
 
-  autoUpdater.checkForUpdatesAndNotify();
-
+  checkForUpdates(); 
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -95,52 +104,5 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
-  }
-});
-
-autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
-  const dialogOpts = {
-      type: 'info',
-      buttons: ['Ok'],
-      title: `Update Available`,
-      message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail: `A new version download started.`
-  };
-
-  if (!updateCheck) {
-      dialog.showMessageBox(dialogOpts);
-      updateCheck = true;
-  }
-});
-
-autoUpdater.on("download-progress", (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  console.log(log_message);
-});
-
-autoUpdater.on("update-downloaded", (_event) => {
-  if (!updateFound) {
-      updateFound = true;
-
-      setTimeout(() => {
-          autoUpdater.quitAndInstall();
-      }, 3500);
-  }
-});
-
-autoUpdater.on("update-not-available", (_event) => {
-  const dialogOpts = {
-      type: 'info',
-      buttons: ['Ok'],
-      title: `Update Not available for `,
-      message: "A message!",
-      detail: `Update Not available for `
-  };
-
-  if (!updateNotAvailable) {
-      updateNotAvailable = true;
-      dialog.showMessageBox(dialogOpts);
   }
 });
