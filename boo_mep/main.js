@@ -3,24 +3,25 @@ const {autoUpdater} = require("electron-updater");
 const path = require('path');
 const { spawn } = require('child_process');
 const express = require('express'); 
+// const ProgressBar = require('electron-progressbar');
+// const log = require('electron-log');
 
 let mainWindow;
 
+let updateCheck = false;
+let updateFound = false;
+let updateNotAvailable = false;
 
-// Función para iniciar el servidor Express
 function startExpressServer() {
   const expressApp = express();
   const PORT = 3001;
 
-  // Sirve la carpeta 'build' que contiene los archivos estáticos de React
   expressApp.use(express.static(path.join(__dirname, 'build')));
 
-  // Maneja todas las rutas con el archivo `index.html` para compatibilidad con React Router
   expressApp.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
   });
 
-  // Inicia el servidor Express
   expressApp.listen(PORT, () => {
     console.log(`Servidor Express corriendo en http://localhost:${PORT}`);
   });
@@ -65,84 +66,24 @@ function createWindow() {
   mainWindow.loadURL('http://localhost:3001');
 
   Menu.setApplicationMenu(null);
-
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.executeJavaScript(`
-      const progressElement = document.createElement('progress');
-      progressElement.id = 'update-progress';
-      progressElement.max = 100;
-      progressElement.value = 0;
-      progressElement.style.position = 'fixed';
-      progressElement.style.top = '20px';
-      progressElement.style.left = '20px';
-      progressElement.style.width = '90%';
-      document.body.appendChild(progressElement);
-    `);
-  });
   
-
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
 
-autoUpdater.on('update-available', () => {
-  //mainWindow.webContents.send('update_available');
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Actualizar', 'Después'],
-    title: 'Actualización disponible',
-    message: 'Una nueva versión está disponible. ¿Desea actualizar ahora?'
-  };
 
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      autoUpdater.downloadUpdate();
-      mainWindow.webContents.send('update_available');
-    }
-    });
-});
-
-autoUpdater.on('download-progress', (progressObj) => {
-  const { percent } = progressObj;
-
-  // Actualizar la barra de progreso en la ventana principal
-  mainWindow.webContents.executeJavaScript(`
-    const progressElement = document.getElementById('update-progress');
-    if (progressElement) {
-      progressElement.value = ${percent};
-    }
-  `);
-});
-
-
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update_downloaded');
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Reiniciar ahora', 'Más tarde'],
-    title: 'Actualización descargada',
-    message: 'La nueva versión se descargó. ¿Quieres reiniciar ahora?',
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) {
-      autoUpdater.quitAndInstall();
-    }
-  });
-});
 
 app.whenReady().then(() => {
-  // Inicia el backend al arrancar la aplicación
+
   startBackend();
 
-  // Inicia el servidor Express
   startExpressServer();
 
-  // Crea la ventana de la aplicación
   createWindow();
 
   autoUpdater.checkForUpdatesAndNotify();
+
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -154,5 +95,52 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+autoUpdater.on("update-available", (_event, releaseNotes, releaseName) => {
+  const dialogOpts = {
+      type: 'info',
+      buttons: ['Ok'],
+      title: `Update Available`,
+      message: process.platform === 'win32' ? releaseNotes : releaseName,
+      detail: `A new version download started.`
+  };
+
+  if (!updateCheck) {
+      dialog.showMessageBox(dialogOpts);
+      updateCheck = true;
+  }
+});
+
+autoUpdater.on("download-progress", (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  console.log(log_message);
+});
+
+autoUpdater.on("update-downloaded", (_event) => {
+  if (!updateFound) {
+      updateFound = true;
+
+      setTimeout(() => {
+          autoUpdater.quitAndInstall();
+      }, 3500);
+  }
+});
+
+autoUpdater.on("update-not-available", (_event) => {
+  const dialogOpts = {
+      type: 'info',
+      buttons: ['Ok'],
+      title: `Update Not available for `,
+      message: "A message!",
+      detail: `Update Not available for `
+  };
+
+  if (!updateNotAvailable) {
+      updateNotAvailable = true;
+      dialog.showMessageBox(dialogOpts);
   }
 });

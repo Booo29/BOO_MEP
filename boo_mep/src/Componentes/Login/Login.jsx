@@ -54,7 +54,7 @@ const Login = () => {
 
   return (
     <div style={{ padding: "16px" }} >
-       <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>Bienvenido/a a EDUPLAN la mejor de lo mejor plataforma de evaluación docente </h1>
+       <h1 style={{textAlign: 'center', fontSize: '2rem', fontWeight: 'bold' }}>EDUPLAN </h1>
         <div className="login-page" >
           <div className="login-card">
             <div className="login-left">
