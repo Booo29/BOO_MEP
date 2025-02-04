@@ -6,19 +6,19 @@ import { useNavigate } from 'react-router-dom';
 
 const tutorials = [
   {
-    title: "React Hooks - Introducción",
-    description: "Aprende los fundamentos de los Hooks en React.",
-    url: "https://www.youtube.com/watch?v=O6P86uwfdR0",
+    title: "¿Cómo Crear una Evaluación?",
+    description: "Aprende como crear evaluaciones.",
+    url: "https://youtu.be/VJ-EW2AhWfg",
   },
   {
-    title: "PrimeReact UI Components",
-    description: "Explora los componentes de PrimeReact y su uso.",
-    url: "https://www.youtube.com/watch?v=xfD9uEq3z7Y",
+    title: "¿Cómo Evaluar a tus Estudiantes?",
+    description: "Aprende como evaluar a tus estudiantes.",
+    url: "https://youtu.be/5hyfQdYG1BA",
   },
   {
-    title: "React con TypeScript",
-    description: "Cómo usar TypeScript en proyectos de React.",
-    url: "https://www.youtube.com/watch?v=Z5iWr6Srsj8",
+    title: "¿Como Crear un Informe",
+    description: "Aprende como crear un informe.",
+    url: "https://youtu.be/IdIlT1SWxvU",
   },
 ];
 
