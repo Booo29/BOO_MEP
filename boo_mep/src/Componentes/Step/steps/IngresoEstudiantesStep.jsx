@@ -223,7 +223,7 @@ const IngresoEstudiantesStep = () => {
               />
           </div>
   
-          <DataTable value={estudiantes} className="p-mt-3" stripedRows >
+          <DataTable value={estudiantes} className="p-mt-3" stripedRows emptyMessage="No hay estudiantes registrados">
           <Column field="Est_Identificacion" header="Identificación" />
           <Column field="Est_Nombre" header="Nombre" />
           <Column field="Est_PrimerApellido" header="Primer Apellido" />

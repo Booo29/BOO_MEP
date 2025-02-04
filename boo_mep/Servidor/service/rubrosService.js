@@ -17,19 +17,42 @@ const GetRubros = (req, res) => {
 const PostRubros = (req, res) => {
     const { nombre, porcentaje } = req.body;
 
-    if (nombre && porcentaje) {
-        connection.query("INSERT INTO rubros_evaluacion SET ?", [{ Rub_Nombre: nombre, Rub_Porcentaje: porcentaje }], (err, results) => {
+    if (!nombre || porcentaje === undefined) {
+        return res.status(400).send("Campos incompletos");
+    }
+
+    connection.query(
+        "INSERT INTO rubros_evaluacion SET ?", 
+        [{ Rub_Nombre: nombre, Rub_Porcentaje: porcentaje }], 
+        (err, results) => {
             if (err) {
                 console.log(err);
                 return res.status(500).send("Error al insertar rubro");
-            } else {
-                return res.status(200).send("Rubro insertado");
             }
-        });
-    } else {
-        return res.status(500).send("Campos incompletos");
-    }
-}
+
+            const insertedId = results.insertId; // Obtener el ID del rubro insertado
+
+            // Consultar el rubro recién insertado
+            connection.query(
+                "SELECT Rub_Id, Rub_Nombre, Rub_Porcentaje FROM rubros_evaluacion WHERE Rub_Id = ?", 
+                [insertedId], 
+                (err, rows) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send("Error al obtener el rubro creado");
+                    }
+
+                    if (rows.length > 0) {
+                        return res.status(200).json(rows[0]); // Enviar el objeto con ID, nombre y porcentaje
+                    } else {
+                        return res.status(404).send("Rubro no encontrado");
+                    }
+                }
+            );
+        }
+    );
+};
+
 
 const PostRubrosConfigurados = (req, res) => {
     let rubros = req.body; // Puede ser un objeto o un array de objetos.

@@ -3,13 +3,15 @@ import { MultiSelect } from "primereact/multiselect";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Card } from "primereact/card";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 import "./StyleSteps.css";
 import Swal from "sweetalert2";
 
 import useCicloStore from "../../../store/CicloStore";
 import useStore from "../../../store/store";
 
-import { getMaterias } from '../../../Servicios/MateriaService';
+import { getMaterias, postMateria } from '../../../Servicios/MateriaService';
 import { getGradoSecciones } from '../../../Servicios/GradoSeccionService';
 import { postGradoSeccionMateria } from '../../../Servicios/GradoSeccionMateriaService';
 
@@ -24,6 +26,10 @@ const GradoSeccionMateriaStep = () => {
     const [gradosYSecciones, setGradosYSecciones] = useState([]);
 
     const [materiasSeleccionadas, setMateriasSeleccionadas] = useState([]);
+
+    const [materiaNueva, setMateriaNueva] = useState("");
+
+    const [openDialog, setOpenDialog] = useState(false);
 
     const toast = React.useRef(null);
 
@@ -135,6 +141,29 @@ const GradoSeccionMateriaStep = () => {
         GuardarGradoSeccionMateria(asignaciones);
     };
 
+    const handleGuardarMateria = async () => {
+        try {
+            const response = await postMateria(materiaNueva);
+            setMaterias([...materias, { label: response.Mat_Nombre, value: response.Mat_Id }]);
+            setMateriaNueva("");
+            setOpenDialog(false);
+            toast.current.show({
+                severity: "success",
+                summary: "Materia creada",
+                detail: "La materia se ha creado correctamente.",
+                life: 3000,
+            });
+        } catch (error) {
+            console.error("Error al crear materia:", error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error al crear materia",
+                detail: "Hubo un error al crear la materia. Por favor, intenta de nuevo.",
+                life: 3000,
+            });
+        }
+    };
+
     return (
         <div className="asignar-materias-container">
             <Toast ref={toast} />
@@ -150,6 +179,7 @@ const GradoSeccionMateriaStep = () => {
                     onChange={(e) => setMateriasSeleccionadas(e.value)}
                     placeholder="Seleccione materias"
                     display="chip"
+                    filter
                 />
                 <Button
                     label="Asignar a Todos"
@@ -157,6 +187,13 @@ const GradoSeccionMateriaStep = () => {
                     severity="info"
                     style={{ marginLeft: "10px" }}
                     onClick={handleAsignarTodas}
+                />
+                <Button
+                    label="Crear Nueva Materia"
+                    icon="pi pi-plus"
+                    style={{ marginLeft: "10px", backgroundColor: "#33b29f", borderColor: "#33b29f" }}
+                    onClick={() => setOpenDialog(true)}
+                    
                 />
             </div>
             <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
@@ -199,6 +236,30 @@ const GradoSeccionMateriaStep = () => {
                 className="p-button-success mt-3"
                 onClick={handleGuardarAsignaciones}
             />
+
+            {/* Dialog para crear materia */}
+            <Dialog
+                header="Crear Nueva Materia"
+                visible={openDialog}
+                style={{ width: "30vw" }}
+                onHide={() => setOpenDialog(false)}
+            >
+                <div className="p-field">
+                    <label htmlFor="materia">Nombre de la Materia</label>
+                    <InputText
+                        id="materia"
+                        value={materiaNueva}
+                        onChange={(e) => setMateriaNueva(e.target.value)}
+                    />
+                </div>
+                <Button
+                    label="Guardar Materia"
+                    icon="pi pi-save"
+                    className="p-button-success mt-3"
+                    onClick={handleGuardarMateria}
+                />
+            </Dialog>
+
         </div>
     );
 };

@@ -91,7 +91,8 @@
       }
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "src/Recursos/icono_1G7_icon.ico"
     }
   }
 }

@@ -75,14 +75,13 @@ const RubrosEvaluacionStep = () => {
     const agregarRubro = async () => {
         try {
             const nuevo = await postRubros({
-                Rub_Nombre: nuevoRubro.nombre,
-                Rub_Porcentaje: nuevoRubro.porcentaje,
+                nombre: nuevoRubro.nombre,
+                porcentaje: nuevoRubro.porcentaje,
             });
 
-            setRubrosDisponibles(prev => [
-                ...prev,
-                { label: `${nuevo.Rub_Nombre} (${nuevo.Rub_Porcentaje}%)`, value: nuevo },
-            ]);
+            console.log("Nuevo rubro:", nuevo.Rub_Id);
+
+            setRubrosDisponibles([...rubrosDisponibles, { label: `${nuevo.Rub_Nombre} (${nuevo.Rub_Porcentaje}%)`, value: nuevo }]);
             setShowDialog(false);
              Swal.fire({
                 icon: "success",
@@ -115,12 +114,19 @@ const RubrosEvaluacionStep = () => {
             return;
         }
 
+        console.log("Datos a insertar periodp:", periodos );
+        console.log("Datos a insertar materias:", materias );
+        console.log("Datos a insertar grados:", grados );
+        console.log("Datos a insertar rubros:", rubros );
+
         const nuevosDatos = grados.map(g => materias.map(m => rubros.map(r => ({
             periodo: periodos[0],
             materia: m,
             grado: g,
             rubro: r,
         })))).flat(2);
+
+        console.log("Nuevos datos:", nuevosDatos);
 
         setDatosInsertados(prev => [...prev, ...nuevosDatos]);
         
@@ -156,6 +162,7 @@ const RubrosEvaluacionStep = () => {
                 Rub_Grado: d.grado,
                 Rub_Materia: d.materia
             }));
+            console.log("Payload:", payload);
             postRubrosConfigurados(payload);
             Swal.fire({
                 icon: "success",
@@ -239,6 +246,7 @@ const RubrosEvaluacionStep = () => {
                         onChange={(e) => setRubros(e.value)}
                         placeholder="Seleccione Rubros"
                         className="w-full"
+                        filter
                         style={{ width: "100%", fontSize: '20px', fontWeight: 'bold' }}
                     />
                 </div>
@@ -281,7 +289,7 @@ const RubrosEvaluacionStep = () => {
                 {Object.values(grupos).map((g, i) => (
                     <Card key={i} title={`${g.materia} - ${g.grado}`} style={{ marginBottom: '16px', fontSize: '20px', fontWeight: 'bold' }}>
                         <ul>
-                            <li><strong >Periodo:</strong> {g.periodo}</li>
+                            {/* <li><strong >Periodo:</strong> {g.periodo}</li> */}
                             <li><strong>Rubros:</strong></li>
                             <ul>
                                 {g.rubros.map((r, j) => (

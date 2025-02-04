@@ -17,19 +17,34 @@ const GetMaterias = (req, res) => {
 const PostMateria = (req, res) => {
     const { nombre } = req.body;
 
-    if (nombre) {
-        connection.query("INSERT INTO materias SET ?", [{ Mat_Nombre: nombre }], (err, results) => {
+    if (!nombre) {
+        return res.status(400).send("Campos incompletos");
+    }
+
+    connection.query("INSERT INTO materias SET ?", [{ Mat_Nombre: nombre }], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error al insertar materia");
+        }
+
+        const insertedId = results.insertId; // Obtener el ID de la materia insertada
+
+        // Consultar la materia recién insertada
+        connection.query("SELECT Mat_Id, Mat_Nombre FROM materias WHERE Mat_Id = ?", [insertedId], (err, rows) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send("Error al insertar materia");
+                return res.status(500).send("Error al obtener la materia creada");
+            }
+
+            if (rows.length > 0) {
+                return res.status(200).json(rows[0]); // Enviar el objeto con ID y nombre
             } else {
-                return res.status(200).send("Materia insertada");
+                return res.status(404).send("Materia no encontrada");
             }
         });
-    } else {
-        return res.status(500).send("Campos incompletos");
-    }
-}
+    });
+};
+
 
 const PutMateria = (req, res) => {
     const { nombre, idMateria } = req.body;
