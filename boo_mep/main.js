@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
+const { app, BrowserWindow, dialog, Menu } = require('electron');
 const {autoUpdater} = require("electron-updater");
 const path = require('path');
 const { spawn } = require('child_process');
@@ -65,6 +65,20 @@ function createWindow() {
   mainWindow.loadURL('http://localhost:3001');
 
   Menu.setApplicationMenu(null);
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.executeJavaScript(`
+      const progressElement = document.createElement('progress');
+      progressElement.id = 'update-progress';
+      progressElement.max = 100;
+      progressElement.value = 0;
+      progressElement.style.position = 'fixed';
+      progressElement.style.top = '20px';
+      progressElement.style.left = '20px';
+      progressElement.style.width = '90%';
+      document.body.appendChild(progressElement);
+    `);
+  });
   
 
   mainWindow.on('closed', () => {
@@ -72,29 +86,38 @@ function createWindow() {
   });
 }
 
-autoUpdater.on('update-available', (event, releaseNotes, releaseName) => {
+autoUpdater.on('update-available', () => {
   //mainWindow.webContents.send('update_available');
   const dialogOpts = {
     type: 'info',
     buttons: ['Actualizar', 'Después'],
     title: 'Actualización disponible',
-    message: process.platform === 'win32' ? releaseNotes : releaseName,
-    detail: 'Una nueva versión está disponible. ¿Desea actualizar ahora?'
+    message: 'Una nueva versión está disponible. ¿Desea actualizar ahora?'
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) {
       autoUpdater.downloadUpdate();
+      mainWindow.webContents.send('update_available');
     }
     });
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
   const { percent } = progressObj;
-  mainWindow.webContents.send('download-progress', percent); // Envía el progreso a la aplicación React
+
+  // Actualizar la barra de progreso en la ventana principal
+  mainWindow.webContents.executeJavaScript(`
+    const progressElement = document.getElementById('update-progress');
+    if (progressElement) {
+      progressElement.value = ${percent};
+    }
+  `);
 });
 
+
 autoUpdater.on('update-downloaded', () => {
+  mainWindow.webContents.send('update_downloaded');
   const dialogOpts = {
     type: 'info',
     buttons: ['Reiniciar ahora', 'Más tarde'],
