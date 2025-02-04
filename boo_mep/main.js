@@ -1,4 +1,5 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
+const {autoUpdater} = require("electron-updater");
 const path = require('path');
 const { spawn } = require('child_process');
 const express = require('express'); 
@@ -56,18 +57,44 @@ function createWindow() {
     height: 600,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
     },
   });
 
   //mainWindow.loadFile(path.join(__dirname, 'build/index.html'));
   mainWindow.loadURL('http://localhost:3001');
+
+  Menu.setApplicationMenu(null);
   
 
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
 }
+
+autoUpdater.on('update-available', (event, releaseNotes, releaseName) => {
+  //mainWindow.webContents.send('update_available');
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Actualizar', 'Después'],
+    title: 'Actualización disponible',
+    message: process.platform === 'win32' ? releaseNotes : releaseName,
+    detail: 'Una nueva versión está disponible. ¿Desea actualizar ahora?'
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    });
+
+});
+
+// autoUpdater.on('update-downloaded', () => {
+//   mainWindow.webContents.send('update_downloaded');
+// });
+
+// ipcMain.on('restart_app', () => {
+//   autoUpdater.quitAndInstall();
+// });
 
 app.whenReady().then(() => {
   // Inicia el backend al arrancar la aplicación
@@ -78,6 +105,8 @@ app.whenReady().then(() => {
 
   // Crea la ventana de la aplicación
   createWindow();
+
+  autoUpdater.checkForUpdatesAndNotify();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
