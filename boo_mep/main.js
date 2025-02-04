@@ -83,18 +83,31 @@ autoUpdater.on('update-available', (event, releaseNotes, releaseName) => {
   };
 
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    if (returnValue.response === 0) {
+      autoUpdater.downloadUpdate();
+    }
     });
-
 });
 
-// autoUpdater.on('update-downloaded', () => {
-//   mainWindow.webContents.send('update_downloaded');
-// });
+autoUpdater.on('download-progress', (progressObj) => {
+  const { percent } = progressObj;
+  mainWindow.webContents.send('download-progress', percent); // Envía el progreso a la aplicación React
+});
 
-// ipcMain.on('restart_app', () => {
-//   autoUpdater.quitAndInstall();
-// });
+autoUpdater.on('update-downloaded', () => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Reiniciar ahora', 'Más tarde'],
+    title: 'Actualización descargada',
+    message: 'La nueva versión se descargó. ¿Quieres reiniciar ahora?',
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
 
 app.whenReady().then(() => {
   // Inicia el backend al arrancar la aplicación
