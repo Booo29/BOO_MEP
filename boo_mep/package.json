@@ -1,6 +1,6 @@
 {
   "name": "eduplan",
-  "version": "1.2.0",
+  "version": "1.1.0",
   "private": true,
   "homepage": ".",
   "main": "main.js",
@@ -34,7 +34,7 @@
     "electron:deploy": "electron-builder build --win --publish always"
 
   },
-  "repository": "https://github.com/Booo29/BOO_MEP.git",
+  "repository": "https://github.com/Booo29/BOO_MEP",
   "eslintConfig": {
     "extends": [
       "react-app",
