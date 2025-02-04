@@ -63,10 +63,11 @@ const Asistencia = () => {
       if (seccion) {
         try {
           const response = await GetMateriasByGradoSeccion(seccion);
+          console.log("response", response);
           setMaterias(
             response.map((mat) => ({
               label: mat.Mat_Nombre,
-              value: mat.Mat_Id,
+              value: mat,
             }))
           );
         } catch (error) {
@@ -76,54 +77,6 @@ const Asistencia = () => {
     };
     fetchMaterias();
   }, [seccion]);
-
-  // Cargar estudiantes cuando se selecciona una materia
-  // useEffect(() => {
-  //   const fetchEstudiantes = async () => {
-  //     if (materia) {
-  //       try {
-  //         console.log("Id seccion ", seccion);
-  //         const response = await getEstudiantes(4, seccion);
-  //         setEstudiantes(
-  //           response.map((est) => ({
-  //             id: est.Est_Identificacion,
-  //             idEstudiante: est.Est_Id,
-  //             nombre: `${est.Est_Nombre} ${est.Est_PrimerApellido} ${est.Est_SegundoApellido}`,
-  //             estado: "Presente",
-  //             justificacion: "",
-  //           }))
-  //         );
-  //       } catch (error) {
-  //         console.error("Error cargando estudiantes:", error);
-  //       }
-  //     }
-  //   };
-  //   fetchEstudiantes();
-  // }, [materia]);
-
-  //Cargar asistencias cuando se selecciona una materia y fecha
-  // useEffect(() => {
-  //   const fetchAsistencias = async () => {
-  //     if (materia && fecha) {
-  //       try {
-  //         const response = await getAsistencia(7, materia, 9, fecha.toISOString().split("T")[0]);
-  //         const estudiantesAsistencia = response.map((est) => ({
-  //           id: est.Est_Identificacion,
-  //           idEstudiante: est.Est_Id,
-  //           nombre: `${est.Est_Nombre} ${est.Est_PrimerApellido} ${est.Est_SegundoApellido}`,
-  //           estado: est.Asi_Asistencia,
-  //           justificacion: est.Asi_Justificacion,
-  //           asistenciaId: est.Asi_Id,
-  //         }));
-  //         setEstudiantes(estudiantesAsistencia);
-  //         setAsistencias(response);
-  //       } catch (error) {
-  //         console.error("Error cargando asistencias:", error);
-  //       }
-  //     }
-  //   };
-  //   fetchAsistencias();
-  // }, [materia, fecha]);
 
 
     // Cargar estudiantes y asistencias cuando se selecciona una materia y fecha
@@ -142,7 +95,7 @@ const Asistencia = () => {
             }));
   
             // Obtener asistencias
-            const asistenciasResponse = await getAsistencia(periodoId, materia, seccion, fecha.toISOString().split("T")[0]);
+            const asistenciasResponse = await getAsistencia(periodoId, materia.Mat_gra_sec_Id, seccion, fecha.toISOString().split("T")[0]);
             const asistenciasData = asistenciasResponse;
   
             // Combinar estudiantes con asistencias
@@ -202,7 +155,7 @@ const Asistencia = () => {
         Asi_Leccion: lecciones,
         Asi_Asistencia: est.estado,
         Asi_Justificacion: est.justificacion,
-        Materia_grado_seccion_Mat_gra_sec_Id: materia,
+        Materia_grado_seccion_Mat_gra_sec_Id: materia.Mat_gra_sec_Id,
         Estudiantes_Est_Id: est.idEstudiante,
         Periodo_Per_Id: periodoId, 
       };
@@ -217,6 +170,7 @@ const Asistencia = () => {
     });
 
     if (asistenciasNuevas.length > 0) {
+
 
       await postAsistencia(asistenciasNuevas);
     }
