@@ -262,7 +262,7 @@ const InformeAsistencia = () => {
               severity="success"
               style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}    
               onClick={handleReportGeneration} 
-              disabled={!selectedReportType || !selectedSeccion || !startDate || !endDate || (selectedReportType === 'InformeAsistenciaIndividual' && !selectedEstudiante)}
+              disabled={!selectedReportType}
             />
           </div>
       </div>
