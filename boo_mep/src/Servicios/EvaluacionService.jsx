@@ -76,3 +76,15 @@ export const PostIndicadoresEvaluacionNiveles = async (data) => {
         throw error;
     }
 }
+
+
+export const DeleteEvaluacion = async (id) => {
+    try {
+        const response = await axios.delete(`http://localhost:3000/evaluaciones/${id}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

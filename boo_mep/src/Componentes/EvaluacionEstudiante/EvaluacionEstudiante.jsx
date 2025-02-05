@@ -4,6 +4,8 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
+import { ColumnGroup } from 'primereact/columngroup';
+import { Row } from 'primereact/row';
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 
@@ -28,6 +30,7 @@ const EvaluacionEstudiante = () => {
   const [materias, setMaterias] = useState([]);
   const [evaluaciones, setEvaluaciones] = useState([]);
   const [estudiantes, setEstudiantes] = useState([]);
+  
   const [selectedSeccion, setSelectedSeccion] = useState(null);
   const [selectedMateria, setSelectedMateria] = useState(null);
   const [selectedEvaluacion, setSelectedEvaluacion] = useState(null);
@@ -89,9 +92,9 @@ const EvaluacionEstudiante = () => {
             const notas = await getEstudiantesNotas(
                 selectedMateria.Mat_gra_sec_Id,
                 selectedMateria.Mat_Id,
-                selectedEvaluacion.Eva_Id,
+                selectedEvaluacion.id,
             );
-           
+
             setEstudiantes(notas);
         }
         catch(error){
@@ -102,40 +105,41 @@ const EvaluacionEstudiante = () => {
     }
   }, [selectedEvaluacion]);
 
-  const handleEdit = (rowData, field, value) => {
-    const updatedEstudiantes = estudiantes.map((est) =>
-      est.Est_Id === rowData.Est_Id ? { ...est, [field]: value } : est
-    );
-    setEstudiantes(updatedEstudiantes);
-  };
 
   const onCellEditComplete = (e) => {
     let { rowData, newValue, field } = e;
     let updatedEstudiantes = [...estudiantes];
-    let index = updatedEstudiantes.findIndex(student => student.Est_Id === rowData.Est_Id);
+    let index = updatedEstudiantes.findIndex(student => student.id === rowData.id);
     
-    if (field === "EvaEst_PuntosObtenidos" && newValue > selectedEvaluacion.Eva_Puntos) {
-        newValue = selectedEvaluacion.Eva_Puntos;
-    }
-    if (field === "EvaEst_PorcentajeObtenido" && newValue > selectedEvaluacion.Eva_Porcentaje) {
-        newValue = selectedEvaluacion.Eva_Porcentaje;
-    }
-    if (field === "EvaEst_NotaFinal" && newValue > 100) {
-        newValue = 100;
-    }
+        if (field === "puntosObtenidos}" && newValue > selectedEvaluacion.puntos) {
+            newValue = selectedEvaluacion.puntos;
+        }
+        if (field === "porcentajeObtenido" && newValue > selectedEvaluacion.porcentaje) {
+            newValue = selectedEvaluacion.porcentaje;
+        }
+        if (field === "notaFinal" && newValue > 100) {
+            newValue = 100;
+        }
+    
 
     updatedEstudiantes[index][field] = newValue;
-    updatedEstudiantes[index].EvaEst_NotaFinal = (updatedEstudiantes[index].EvaEst_PuntosObtenidos * 100) / selectedEvaluacion.Eva_Puntos;
+    updatedEstudiantes[index].evaluacion.notaFinal = (updatedEstudiantes[index].evaluacion.puntosObtenidos * 100) / selectedEvaluacion.puntos;
+    console.log("estudiante actualizado", updatedEstudiantes);
     setEstudiantes(updatedEstudiantes);
 };
 
 const applyGlobalValues = () => {
     let updatedEstudiantes = estudiantes.map(student => ({
         ...student,
-        EvaEst_PorcentajeObtenido: porcentajeGlobal > selectedEvaluacion.Eva_Porcentaje ? selectedEvaluacion.Eva_Porcentaje : porcentajeGlobal,
-        EvaEst_PuntosObtenidos: notaGlobal > selectedEvaluacion.Eva_Puntos ? selectedEvaluacion.Eva_Puntos : notaGlobal,
-        EvaEst_NotaFinal: (notaGlobal * 100) / selectedEvaluacion.Eva_Puntos
+        evaluacion: {
+            ...student.evaluacion,
+            porcentajeObtenido: porcentajeGlobal > selectedEvaluacion.porcentaje ? selectedEvaluacion.porcentaje : porcentajeGlobal,
+            puntosObtenidos: notaGlobal > selectedEvaluacion.puntos ? selectedEvaluacion.puntos : notaGlobal,
+            notaFinal: (notaGlobal * 100) / selectedEvaluacion.puntos
+        }
     }));
+
+    console.log("estudiantes actualizados", updatedEstudiantes);
     setEstudiantes(updatedEstudiantes);
 };
 
@@ -146,19 +150,27 @@ const applyGlobalValues = () => {
     
         estudiantes.forEach((est) => {
             const data = {
-                EvaEst_PuntosObtenidos: est.EvaEst_PuntosObtenidos,
-                EvaEst_PorcentajeObtenido: est.EvaEst_PorcentajeObtenido,
-                EvaEst_NotaFinal: est.EvaEst_NotaFinal,
-                Evaluaciones_Eva_Id: selectedEvaluacion.Eva_Id,
-                Estudiantes_Est_Id: est.Est_Id,
+                EvaEst_PuntosObtenidos: est.evaluacion.puntosObtenidos,
+                EvaEst_PorcentajeObtenido: est.evaluacion.porcentajeObtenido,
+                EvaEst_NotaFinal: est.evaluacion.notaFinal,
+                Evaluaciones_Eva_Id: selectedEvaluacion.id,
+                Estudiantes_Est_Id: est.id,
+                EvaEst_Id: est.evaluacion.id,
                 Materia_grado_seccion_Mat_gra_sec_Id: selectedMateria.Mat_gra_sec_Id,
+                evaluacionIndicadores: est.indicadores.map(ind => 
+                    ({ 
+                        Eva_Ind_Id : ind.idEvaluacionIndicador,
+                        Eva_Ind_Nota: ind.nota, 
+                        Evaluacion_Estudiante_EvaEst_Id : est.evaluacion.id,
+                        Indicadores_Desempeno_Ind_Des_Id: ind.id 
+                    })),
+
             };
-            if (est.EvaEst_Id) {
-                
-                NotaActualizada.push({...data, EvaEst_Id: est.EvaEst_Id});
-            } else {
-               
+            if(est.evaluacion.id === null || !est.evaluacion.id || est.evaluacion.id === ''){
                 notaNueva.push(data);
+            }
+            else{
+                NotaActualizada.push(data);
             }
         });
         if(notaNueva.length > 0){
@@ -193,7 +205,40 @@ const applyGlobalValues = () => {
     navigate('/MenuPage');
   };
 
-  
+  const headerGroup = (
+    <ColumnGroup>
+        <Row>
+            {/* Encabezados fijos */}
+            <Column header="Identificación" rowSpan={2} />
+            <Column header="Nombre" rowSpan={2} />
+            <Column header="Primer Apellido" rowSpan={2} />
+            <Column header="Segundo Apellido" rowSpan={2} />
+            <Column header="% Evaluación" rowSpan={2} />
+            <Column header="Puntos Evaluación" rowSpan={2} />
+
+            {/* Encabezados dinámicos para indicadores */}
+            {selectedEvaluacion?.indicadores?.map((indicador) => (
+                <Column 
+                    style={{ minWidth: '500px' }} 
+                    key={indicador.id} 
+                    header={indicador.niveles.map(nivel => `${nivel.nivel} : ${nivel.puntos} pts`).join(" | ")} 
+                />
+            ))}
+
+            <Column header="% Obtenido" rowSpan={2} />
+            <Column header="Puntos Obtenidos" rowSpan={2} />
+            <Column header="Nota Final" rowSpan={2} />
+        </Row>
+
+        <Row>
+            {/* Subcolumnas de niveles de desempeño */}
+            {selectedEvaluacion?.indicadores?.map((indicador) =>
+                <Column key={indicador.id} header={indicador.nombre} />
+            )}
+        </Row>
+    </ColumnGroup>
+);
+
 
   return (
     <div style={{ padding: "16px" }} >
@@ -226,7 +271,7 @@ const applyGlobalValues = () => {
                 value={selectedEvaluacion}
                 options={evaluaciones}
                 onChange={(e) => setSelectedEvaluacion(e.value)}
-                optionLabel="Eva_Nombre"
+                optionLabel="nombre"
                 placeholder="Seleccione una Evaluación"
                 disabled={!selectedMateria}
                 style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}
@@ -266,21 +311,76 @@ const applyGlobalValues = () => {
 
       <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
 
-      <DataTable value={estudiantes} editMode="cell" stripedRows emptyMessage="No hay estudiantes para mostrar">
-        <Column field="Est_Identificacion" header="Identificacion" />
-        <Column field="Est_Nombre" header="Nombre" />
-        <Column field="Est_PrimerApellido" header="Primer Apellido" />
-        <Column field="Est_SegundoApellido" header="Segundo Apellido" />
+      <DataTable showGridlines  value={estudiantes} editMode="cell" stripedRows emptyMessage="No hay estudiantes para mostrar" headerColumnGroup={headerGroup}  scrollable scrollHeight="500px" >
+        <Column field="identificacion" />
+        <Column field="nombre" />
+        <Column field="primerApellido" />
+        <Column field="segundoApellido" />
 
-        <Column field="Eva_Porcentaje" header="% Evaluación" body={() => selectedEvaluacion?.Eva_Porcentaje} />
-        <Column field="Eva_Puntos" header="Puntos Evaluación" body={() => selectedEvaluacion?.Eva_Puntos} />
+        <Column field="porcentaje"  body={() => selectedEvaluacion?.porcentaje}/>
+        <Column field="puntos"  body={() => selectedEvaluacion?.puntos}/>
 
-        <Column field="EvaEst_PorcentajeObtenido" header="% Obtenido"  editor={(options) => (
+        {selectedEvaluacion?.indicadores?.map((indicador) => {
+            // Buscar la nota correspondiente al indicador en la tabla intermedia
+            const evaluacion = estudiantes
+                .map(est => 
+                    est.indicadores
+                        .map(ind => ind.id)
+                        .includes(indicador.id) ? est.indicadores.find(ind => ind.id === indicador.id) : null
+                )
+                .find(e => e !== null);
+
+            const nota = evaluacion ? evaluacion.nota : 0; // Usar 0 como valor por defecto si no se encuentra la nota
+
+            return (
+                <Column
+                    key={indicador.id}
+                    field={`indicador_${indicador.id}`}
+                    body={(rowData) => rowData.indicadores.find(ind => ind.id === indicador.id)?.nota || 0}
+                    editor={(options) => {
+                        const value = options.rowData.indicadores.find(ind => ind.id === indicador.id)?.nota || 0;
+                        return (
+                            <InputNumber 
+                                value={value} 
+                                onValueChange={(e) => options.editorCallback(e.value)} 
+                                min={0} 
+                                style={{ width: '100%' }} 
+                                mode="decimal"
+                            />
+                        );
+                    }}
+                    onCellEditComplete={(e) => {
+                        let { rowData, newValue, field } = e;
+                        let updatedEstudiantes = [...estudiantes];
+                        let index = updatedEstudiantes.findIndex(student => student.id === rowData.id);
+                        
+                        if (index === -1) return; // Si no se encuentra el estudiante, salimos
+
+                        let indicadores = updatedEstudiantes[index].indicadores;
+                        let indicadorIndex = indicadores.findIndex(ind => ind.id === indicador.id);
+                        
+                        if (indicadorIndex === -1) {
+                            // Si no encontramos el indicador en la lista de indicadores del estudiante, lo agregamos
+                            indicadores.push({ id: indicador.id, nota: newValue });
+                        } else {
+                            // Si encontramos el indicador, actualizamos la nota
+                            indicadores[indicadorIndex].nota = newValue;
+                        }
+
+                        updatedEstudiantes[index].indicadores = indicadores;
+                        setEstudiantes(updatedEstudiantes); // Actualizamos el estado con los estudiantes modificados
+                    }}
+                />
+            );
+        })}
+
+
+        <Column field="evaluacion.porcentajeObtenido"  editor={(options) => (
             <InputNumber 
                 value={options.value}
                 onValueChange={(e) => options.editorCallback(e.value)} 
                 min={0} 
-                max={selectedEvaluacion?.Eva_Porcentaje} 
+                max={selectedEvaluacion?.porcentaje} 
                 mode="decimal"
                 placeholder="Porcentaje"
             />
@@ -288,17 +388,17 @@ const applyGlobalValues = () => {
         onCellEditComplete={onCellEditComplete} 
         />
 
-        <Column field="EvaEst_PuntosObtenidos" header="Puntos Obtenidos" editor={(options) => (
+        <Column field="evaluacion.puntosObtenidos" editor={(options) => (
             <InputNumber 
                 value={options.value} 
                 onValueChange={(e) => options.editorCallback(e.value)} 
                 min={0} 
-                max={selectedEvaluacion?.Eva_Puntos} 
+                max={selectedEvaluacion?.puntos} 
                 mode="decimal"
             />
         )} onCellEditComplete={onCellEditComplete} />
 
-        <Column field="EvaEst_NotaFinal" header="Nota Final" editor={(options) => (
+        <Column field="evaluacion.notaFinal" editor={(options) => (
             <InputNumber 
                 value={options.value} 
                 onValueChange={(e) => options.editorCallback(e.value)}
@@ -308,7 +408,7 @@ const applyGlobalValues = () => {
                 
             />
         )} onCellEditComplete={onCellEditComplete} />
-                
+                        
       </DataTable>
       <Button 
         label="Guardar Notas" 

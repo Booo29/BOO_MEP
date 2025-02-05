@@ -131,21 +131,107 @@ const PostIndicadores = (req, res) => {
 
 // Evaluaciones
 
+// const GetEvaluaciones = (req, res) => {
+//     const {Eva_Materia, Eva_Grado, Periodo_idPeriodo} = req.query;
+
+//     const query = `
+//         SELECT * FROM Evaluaciones WHERE Eva_Materia = ? AND Eva_Grado = ? AND Periodo_idPeriodo = ?
+//     `;
+//     connection.query(query, [Eva_Materia, Eva_Grado, Periodo_idPeriodo], (err, rows) => {
+//         if (err) {
+//             console.error("Error al obtener las evaluaciones:", err);
+//             return res.status(500).send("Error al obtener las evaluaciones");
+//         }
+
+//         return res.json(rows);
+//     });
+// }
+
 const GetEvaluaciones = (req, res) => {
-    const {Eva_Materia, Eva_Grado, Periodo_idPeriodo} = req.query;
+    const { Eva_Materia, Eva_Grado, Periodo_idPeriodo } = req.query; // Obtener parámetros de consulta
+
+    if (!Eva_Materia || !Eva_Grado || !Periodo_idPeriodo) {
+        return res.status(400).json({ message: "Faltan parámetros en la solicitud" });
+    }
 
     const query = `
-        SELECT * FROM Evaluaciones WHERE Eva_Materia = ? AND Eva_Grado = ? AND Periodo_idPeriodo = ?
+        SELECT 
+            e.Eva_Id,
+            e.Eva_Nombre,
+            e.Eva_Fecha,
+            e.Eva_Porcentaje,
+            e.Eva_Puntos,
+            e.Eva_Grado,
+            e.Eva_Materia,
+            e.Periodo_idPeriodo,
+            ie.Ind_Eva_Id,
+            i.Ind_Id,
+            i.Ind_Nombre,
+            id.Niveles_desempeno_Niv_Id,
+            nd.Niv_Nivel,
+            nd.Niv_Puntos,
+            nd.Niv_Descripcion
+        FROM evaluaciones e
+        LEFT JOIN indicadores_evaluacion ie ON e.Eva_Id = ie.Evaluaciones_Eva_Id
+        LEFT JOIN indicadores i ON ie.Indicadores_Ind_Id = i.Ind_Id
+        LEFT JOIN indicadores_desempeno id ON ie.Ind_Eva_Id = id.Indicadores_Evaluacion_Ind_Eva_Id
+        LEFT JOIN niveles_desempeno nd ON id.Niveles_desempeno_Niv_Id = nd.Niv_Id
+        WHERE e.Eva_Estado = 'A' AND e.Eva_Materia = ? AND e.Eva_Grado = ? AND e.Periodo_idPeriodo = ?;
     `;
-    connection.query(query, [Eva_Materia, Eva_Grado, Periodo_idPeriodo], (err, rows) => {
+
+    connection.query(query, [Eva_Materia, Eva_Grado, Periodo_idPeriodo], (err, results) => {
         if (err) {
-            console.error("Error al obtener las evaluaciones:", err);
-            return res.status(500).send("Error al obtener las evaluaciones");
+            console.error("Error al obtener evaluaciones:", err);
+            return res.status(500).json({ message: "Error interno del servidor" });
         }
 
-        return res.json(rows);
+        // Agrupar resultados para estructurar mejor la respuesta
+        const evaluaciones = {};
+        results.forEach(row => {
+            const evaId = row.Eva_Id;
+
+            if (!evaluaciones[evaId]) {
+                evaluaciones[evaId] = {
+                    id: evaId,
+                    nombre: row.Eva_Nombre,
+                    fecha: row.Eva_Fecha,
+                    porcentaje: row.Eva_Porcentaje,
+                    puntos: row.Eva_Puntos,
+                    grado: row.Eva_Grado,
+                    materia: row.Eva_Materia,
+                    periodo: row.Periodo_idPeriodo,
+                    indicadores: []
+                };
+            }
+
+            if (row.Ind_Id) {
+                let indicador = evaluaciones[evaId].indicadores.find(ind => ind.id === row.Ind_Id);
+
+                if (!indicador) {
+                    indicador = {
+                        id: row.Ind_Id,
+                        nombre: row.Ind_Nombre,
+                        niveles: []
+                    };
+                    evaluaciones[evaId].indicadores.push(indicador);
+                }
+
+                if (row.Niveles_desempeno_Niv_Id) {
+                    indicador.niveles.push({
+                        id: row.Niveles_desempeno_Niv_Id,
+                        nivel: row.Niv_Nivel,
+                        puntos: row.Niv_Puntos,
+                        descripcion: row.Niv_Descripcion
+                    });
+                }
+            }
+        });
+
+        return res.status(200).json(Object.values(evaluaciones));
     });
-}
+};
+
+
 const PostEvaluaciones = (req, res) => {
     const datos = Array.isArray(req.body) ? req.body : [req.body]; 
 
@@ -196,6 +282,25 @@ const PostEvaluaciones = (req, res) => {
         });
     });
 };
+
+
+const DeleteEvaluacion = (req, res) => {
+    const { id } = req.params;
+
+    if(id){
+        connection.query("UPDATE Evaluaciones SET Eva_Estado = 'I' WHERE Eva_Id = ?", [id], (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send("Error al eliminar evaluación");
+            } else {
+                return res.status(200).send("Evaluación eliminada");
+            }
+        });
+    } else {
+        return res.status(500).send("Campos incompletos");
+    }
+}
+
 
 
 // Indicadores más evaluaciones y desempeño 
@@ -322,6 +427,7 @@ app.get("/indicadores", GetIndicadores);
 app.post("/indicadores", PostIndicadores);
 app.get("/evaluaciones", GetEvaluaciones);
 app.post("/evaluaciones", PostEvaluaciones);
+app.delete("/evaluaciones/:id", DeleteEvaluacion);
 app.post("/indicadoresEvaluacionNiveles", PostIndicadoresEvaluacionNiveles);
 
 module.exports = app;

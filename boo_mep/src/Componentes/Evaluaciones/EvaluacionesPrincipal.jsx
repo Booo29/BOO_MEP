@@ -4,8 +4,9 @@ import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
-import {GetEvaluaciones} from '../../Servicios/EvaluacionService'; 
+import {GetEvaluaciones, DeleteEvaluacion} from '../../Servicios/EvaluacionService'; 
 import {getGradoSecciones} from '../../Servicios/GradoSeccionService';
 import {GetMateriasByGradoSeccion} from '../../Servicios/MateriaService';
 
@@ -31,6 +32,9 @@ const EvaluacionesPrincipal = () => {
     const [selectedGrado, setSelectedGrado] = useState(null);
     const [selectedMateria, setSelectedMateria] = useState(null);
     const [evaluaciones, setEvaluaciones] = useState([]);
+
+    const [expandedRows, setExpandedRows] = useState(null); // Estado para manejar las filas expandidas
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -86,9 +90,62 @@ const EvaluacionesPrincipal = () => {
         setGradoNombre(selectedGrado.nombre);
     }
 
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás revertir esto!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, bórralo'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                DeleteEvaluacion(id).then(() => {
+                    Swal.fire(
+                        '¡Borrado!',
+                        'La evaluación ha sido eliminada.',
+                        'success'
+                    );
+                    setEvaluaciones(evaluaciones.filter((evaluacion) => evaluacion.id !== id));
+                }).catch((error) => {
+                    Swal.fire(
+                        '¡Error!',
+                        'Ha ocurrido un error al intentar eliminar la evaluación.',
+                        'error'
+                    );
+                });
+            }
+        });
+    }
+
     const handleMenu = () => {
         navigate('/MenuPage');
       }
+
+          // Función para mostrar la tabla de indicadores cuando se expande la fila
+    const rowExpansionTemplate = (rowData) => {
+        return (
+            <div style={{ padding: "16px" }}>
+                {rowData.indicadores.length > 0 ? (
+                    <DataTable value={rowData.indicadores} responsiveLayout="scroll">
+                        <Column field="nombre" header="Indicador" />
+                        <Column body={(rowData) => (
+                            <DataTable value={rowData.niveles} responsiveLayout="scroll">
+                                <Column field="nivel" header="Nivel" />
+                                <Column field="puntos" header="Puntos" />
+                                <Column field="descripcion" header="Descripción" />
+                            </DataTable>
+                        )} header="Niveles" />
+                    </DataTable>
+                ) : (
+                    <p style={{ textAlign: "center", fontWeight: "bold", color: "gray" }}>
+                        No tienen indicadores asignados
+                    </p>
+                )}
+            </div>
+        );
+    };
 
 
     return (
@@ -132,15 +189,26 @@ const EvaluacionesPrincipal = () => {
                 disabled={!selectedGrado || !selectedMateria}
             />
     
-            <DataTable value={evaluaciones} emptyMessage="No hay evaluaciones registradas" stripedRows>
-                <Column field="Eva_Nombre" header="Nombre" />
-                <Column field="Eva_Puntos" header="Puntos" />
-                <Column field="Eva_Porcentaje" header="Porcentaje" />
-                <Column field="Eva_Fecha" header="Fecha" />
+            <DataTable 
+                value={evaluaciones} 
+                emptyMessage="No hay evaluaciones registradas" 
+                stripedRows
+                // expandableRowGroups
+                expandedRows={expandedRows}
+                onRowToggle={(e) => setExpandedRows(e.data)}
+                rowExpansionTemplate={rowExpansionTemplate}
+                dataKey="id"
+            >
+                <Column expander style={{ width: '3rem' }} />
+                <Column field="nombre" header="Nombre" />
+                <Column field="puntos" header="Puntos" />
+                <Column field="porcentaje" header="Porcentaje" />
+                <Column field="fecha" header="Fecha" />
+
                 <Column body={(rowData) => (
                     <div style={{ display: "flex", gap: "8px" }}>
                         {/* <Button icon="pi pi-pencil" className="p-button-warning" onClick={() => {}} /> */}
-                        <Button icon="pi pi-trash" className="p-button-danger" onClick={() => {}} />
+                        <Button icon="pi pi-trash" className="p-button-danger" onClick={() => handleDelete(rowData.id)} />
                     </div>
                 )} />
             </DataTable>
