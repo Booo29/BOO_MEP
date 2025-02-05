@@ -9,6 +9,7 @@ import Evaluacion from "../../Recursos/icono_Evaluacion.png";
 import Asistencia from "../../Recursos/icono_Asistencia.png";
 import Informes from "../../Recursos/icono_informe.png";
 import Tutoriales from "../../Recursos/icono_tutorial.png";
+import Cronicas from "../../Recursos/icono_cronica.png";
 
 
 const Menu = () => {
@@ -44,6 +45,13 @@ const Menu = () => {
             imagen: Informes,          
             color: "#42DC98",
             onClick: () => navigate("/InformesPage"),
+        },
+
+        {
+            nombre: "Cronicas",
+            imagen: Cronicas,           
+            color: "#ea639a",
+            onClick: () => navigate("/CronicasPage"),
         },
 
         {

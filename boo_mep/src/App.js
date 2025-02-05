@@ -13,6 +13,7 @@ import EvaluacionEstudiantePage from "./Paginas/EvaluacionEstudiantePage";
 import ListasPage from "./Paginas/ListasPage";
 import InformesPage from "./Paginas/InformesPage";
 import TutorialesPage from "./Paginas/TutorialesPage";
+import CronicasPage from "./Paginas/CronicasPage";
 
 export function App() {
   return (
@@ -32,6 +33,7 @@ export function App() {
           <Route path="/ListasPage" element={<ListasPage />} />
           <Route path="/InformesPage" element={<InformesPage />} />
           <Route path="/TutorialesPage" element={<TutorialesPage />} />
+          <Route path="/CronicasPage" element={<CronicasPage />} />
           
 
           <Route path="*" element={<Navigate to="/" replace />} />

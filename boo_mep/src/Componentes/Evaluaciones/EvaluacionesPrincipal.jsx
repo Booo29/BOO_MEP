@@ -98,15 +98,18 @@ const EvaluacionesPrincipal = () => {
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
+            cancelButtonText: 'Cancelar',
             confirmButtonText: 'Sí, bórralo'
         }).then((result) => {
             if (result.isConfirmed) {
                 DeleteEvaluacion(id).then(() => {
-                    Swal.fire(
-                        '¡Borrado!',
-                        'La evaluación ha sido eliminada.',
-                        'success'
-                    );
+                    Swal.fire({
+                        icon: "success",
+                        title: "Evaluación eliminada",
+                        text: "La evaluación ha sido eliminada exitosamente.",
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
                     setEvaluaciones(evaluaciones.filter((evaluacion) => evaluacion.id !== id));
                 }).catch((error) => {
                     Swal.fire(

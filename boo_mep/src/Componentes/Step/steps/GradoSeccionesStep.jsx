@@ -18,7 +18,7 @@ const GradoSeccionesStep = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [nuevoGrado, setNuevoGrado] = useState({ Gra_Nombre: "", Gra_Tipo: "Primaria" });
 
-    const tipos = ["Primaria", "Secundaria", "Otros"];
+    const tipos = ["Primaria", "Secundaria", "Cindea", "Otros"];
 
     useEffect(() => {
         const cargarGrados = async () => {
@@ -144,7 +144,7 @@ const GradoSeccionesStep = () => {
 
             {/* Parte Superior: Checkboxes */}
             <div className="grados-container">
-            {["Primaria", "Secundaria", "Otros"].map((tipo, index) => (
+            {["Primaria", "Secundaria", "Cindea", "Otros"].map((tipo, index) => (
                     <div key={tipo} className={`grados-columna ${index > 0 ? "columna-separada" : ""}`}>
                         <h4>{tipo}</h4>
                         {gradosPorTipo(tipo).map((grado) => (
