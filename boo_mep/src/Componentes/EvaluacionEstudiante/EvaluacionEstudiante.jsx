@@ -75,7 +75,7 @@ const EvaluacionEstudiante = () => {
                 selectedSeccion.Gra_Nombre,
                 periodoId
             );
-            console.log("evaluaciones", evaluaciones);
+    
             setEvaluaciones(evaluaciones);
         }
         catch(error){
@@ -142,7 +142,7 @@ const applyGlobalValues = () => {
         }
     }));
 
-    console.log("estudiantes actualizados", updatedEstudiantes);
+    
     setEstudiantes(updatedEstudiantes);
 };
 

@@ -79,7 +79,7 @@ const RubrosEvaluacionStep = () => {
                 porcentaje: nuevoRubro.porcentaje,
             });
 
-            console.log("Nuevo rubro:", nuevo.Rub_Id);
+            
 
             setRubrosDisponibles([...rubrosDisponibles, { label: `${nuevo.Rub_Nombre} (${nuevo.Rub_Porcentaje}%)`, value: nuevo }]);
             setShowDialog(false);
@@ -114,10 +114,7 @@ const RubrosEvaluacionStep = () => {
             return;
         }
 
-        console.log("Datos a insertar periodp:", periodos );
-        console.log("Datos a insertar materias:", materias );
-        console.log("Datos a insertar grados:", grados );
-        console.log("Datos a insertar rubros:", rubros );
+       
 
         const nuevosDatos = grados.map(g => materias.map(m => rubros.map(r => ({
             periodo: periodos[0],
@@ -126,7 +123,7 @@ const RubrosEvaluacionStep = () => {
             rubro: r,
         })))).flat(2);
 
-        console.log("Nuevos datos:", nuevosDatos);
+        
 
         setDatosInsertados(prev => [...prev, ...nuevosDatos]);
         
@@ -162,7 +159,7 @@ const RubrosEvaluacionStep = () => {
                 Rub_Grado: d.grado,
                 Rub_Materia: d.materia
             }));
-            console.log("Payload:", payload);
+            
             postRubrosConfigurados(payload);
             Swal.fire({
                 icon: "success",

@@ -76,7 +76,6 @@ const Asistencia = () => {
       if (seccion) {
         try {
           const response = await GetMateriasByGradoSeccion(seccion);
-          console.log("response", response);
           setMaterias(
             response.map((mat) => ({
               label: mat.Mat_Nombre,

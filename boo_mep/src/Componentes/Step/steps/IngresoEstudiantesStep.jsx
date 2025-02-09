@@ -88,23 +88,92 @@ const IngresoEstudiantesStep = () => {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
+
     reader.onload = (e) => {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const json = XLSX.utils.sheet_to_json(worksheet);
 
-      // Add students from Excel to the list
-      const newStudents = json.map((row) => ({
-        id: Date.now() + Math.random(),
-        Est_Identificacion: row.Identificacion,
-        Est_Nombre: row['Primer Nombre'],
-        Est_PrimerApellido: row['Primer Apellido'],
-        Est_SegundoApellido: row['Segundo Apellido'],
-      }));
+      const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-      setEstudiantes((prev) => [...prev, ...newStudents]);
+      if(json.length === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "Archivo vacío",
+          text: "El archivo seleccionado no contiene estudiantes.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        return;
+      }
+
+      const columnMapping = {
+        identificacion: ["identificación", "id", "cedula", "cédula", "identificacion", "Cédula", "Identificación", "ID", "Cedula", "Identificacion"],
+        nombre: ["primer nombre", "nombre1", "nombre", "Nombre", "Nombre1", "Primer nombre", "Primer Nombre"],
+        primerApellido: ["primer apellido", "apellido1", "apellido", "Apellido", "Apellido1", "Primer apellido", "Primer Apellido"],
+        segundoApellido: ["segundo apellido", "apellido2", "Apellido2", "Segundo apellido", "Segundo Apellido"],
+    };
+
+    let headerRowIndex = -1;
+    let headers = [];
+
+    for (let i = 0; i < json.length; i++) {
+      const row = json[i].map((cell) => (cell ? cell.toString().trim().toLowerCase() : ""));
+      if (
+          Object.values(columnMapping).some((possibleNames) =>
+          row.some((header) => possibleNames.includes(header))
+          )
+      ) {
+          headerRowIndex = i;
+          headers = row;
+          break;
+      }
+  }
+
+  if (headerRowIndex === -1) {    
+    Swal.fire({
+      icon: "error",
+      title: "Encabezados no encontrados",
+      text: "No se encontraron los encabezados esperados en el archivo.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+    return;
+  }
+
+  const findColumnIndex = (possibleNames) => {
+    return headers.findIndex((header) => possibleNames.includes(header));
+  };
+
+
+  const idxIdentificacion = findColumnIndex(columnMapping.identificacion);
+  const idxNombre = findColumnIndex(columnMapping.nombre);
+  const idxPrimerApellido = findColumnIndex(columnMapping.primerApellido);
+  const idxSegundoApellido = findColumnIndex(columnMapping.segundoApellido);
+
+  if ([idxIdentificacion, idxNombre, idxPrimerApellido].some((idx) => idx === -1)) {
+    Swal.fire({
+      icon: "error",
+      title: "Columnas faltantes",
+      text: "El archivo Excel no tiene todas las columnas requeridas.",
+    });
+    return;
+  }
+
+  const dataRows = json.slice(headerRowIndex + 1);
+
+  const newStudents = dataRows.map((row) => ({
+    id: Date.now() + Math.random(),
+    Est_Identificacion: row[idxIdentificacion] || "",
+    Est_Nombre: row[idxNombre] || "",
+    Est_PrimerApellido: row[idxPrimerApellido] || "",
+    Est_SegundoApellido: idxSegundoApellido !== -1 ? row[idxSegundoApellido] || "" : "",
+    Grado_Seccion_Id_Grado_Seccion: selectedSeccion,
+  }));
+
+
+  setEstudiantes((prev) => [...prev, ...newStudents]);
     };
     reader.readAsArrayBuffer(file);
   };
