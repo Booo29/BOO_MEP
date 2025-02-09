@@ -10,6 +10,7 @@ import Asistencia from "../../Recursos/icono_Asistencia.png";
 import Informes from "../../Recursos/icono_informe.png";
 import Tutoriales from "../../Recursos/icono_tutorial.png";
 import Cronicas from "../../Recursos/icono_cronica.png";
+import Eliminar from "../../Recursos/icono_eliminar.png";
 
 
 const Menu = () => {
@@ -60,6 +61,12 @@ const Menu = () => {
             color: "#E262E8",
             onClick: () => navigate("/TutorialesPage"),
         },
+        {
+            nombre: "Eliminar Ciclo",
+            imagen: Eliminar,           
+            color: "#e8364f",
+            onClick: () => navigate("/EliminarCicloPage"),
+        }
 
     ];
 
