@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
+import { addLocale } from 'primereact/api';
 import { InputNumber } from "primereact/inputnumber";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
@@ -36,6 +37,18 @@ const Asistencia = () => {
   const [materia, setMateria] = useState(null);
   const [fecha, setFecha] = useState(null);
   const [lecciones, setLecciones] = useState(1);
+
+  addLocale('es', {
+          firstDayOfWeek: 1,
+          showMonthAfterYear: true,
+          dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+          dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+          dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+          monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+          monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+          today: 'Hoy',
+          clear: 'Limpiar'
+  });
 
   const toast = React.useRef(null);
 
@@ -232,6 +245,7 @@ const Asistencia = () => {
               onChange={(e) => setFecha(e.value)}
               placeholder="Seleccione la fecha"
               dateFormat="dd/mm/yy"
+              locale="es"
             />
           {/* </div> */}
         </div>
@@ -265,7 +279,7 @@ const Asistencia = () => {
         </div>
 
         <DataTable value={estudiantes} className="p-mt-4" stripedRows emptyMessage="No hay estudiantes para mostrar">
-          <Column field="nombre" header="Nombre" />
+          <Column field="nombre" header="Nombre" sortable />
           <Column
             field="estado"
             header="Tipo de Asistencia"

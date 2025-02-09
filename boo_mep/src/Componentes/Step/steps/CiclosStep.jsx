@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { ListBox } from "primereact/listbox";
 import { Calendar } from "primereact/calendar";
+import { addLocale } from 'primereact/api';
 import { postCiclo } from "../../../Servicios/CicloService";
 import useStore from "../../../store/store";
 import useCicloStore from "../../../store/CicloStore";
@@ -17,6 +18,18 @@ const CiclosStep = () => {
 
   const idInstitucion = useStore((state) => state.institutionId);
   const setCicloId = useCicloStore((state) => state.setCicloId);
+
+      addLocale('es', {
+          firstDayOfWeek: 1,
+          showMonthAfterYear: true,
+          dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+          dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+          dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+          monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+          monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+          today: 'Hoy',
+          clear: 'Limpiar'
+      });
 
   const handleSaveCiclo = async () => {
 
@@ -84,6 +97,7 @@ const CiclosStep = () => {
                 required 
                 style={{fontSize: "20px", width: "100%"}} 
                 placeholder="Seleccione una fecha de inicio de ciclo"
+                locale="es"
               />
             </div>
             <div className="p-field">
@@ -96,6 +110,7 @@ const CiclosStep = () => {
                 required 
                 style={{fontSize: "20px", width: "100%"}}
                 placeholder="Seleccione una fecha de fin de ciclo"
+                locale="es"
               />
             </div>
             <div className="p-field">

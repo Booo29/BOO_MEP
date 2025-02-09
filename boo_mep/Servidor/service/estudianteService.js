@@ -87,6 +87,7 @@ const GetEstudiantes = (req, res) => {
         INNER JOIN 
             grados g ON gs.Grados_idGrados = g.Gra_Id
         WHERE 
+            e.Est_Estado = 'A' AND
             gs.Ciclo_Cic_Id = ? AND gs.Id_Grado_Seccion = ? 
     `;
 

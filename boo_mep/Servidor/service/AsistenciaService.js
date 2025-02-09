@@ -118,6 +118,7 @@ const GetAsistencia = (req, res) => {
             AND a.Periodo_Per_Id = ?
             AND a.Asi_Fecha = ?
         WHERE 
+            e.Est_Estado = 'A' AND
             e.Grado_Seccion_Id_Grado_Seccion = ?
     `;
 

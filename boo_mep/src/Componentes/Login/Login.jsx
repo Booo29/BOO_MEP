@@ -7,6 +7,10 @@ import './Login.css';
 import imgLogin from '../../Recursos/Login.jfif';
 import Swal from 'sweetalert2';
 
+import { Password } from 'primereact/password';
+import { InputText } from 'primereact/inputtext';    
+import { Button } from 'primereact/button'; 
+import { style } from 'framer-motion/client';
 
 const Login = () => {
 
@@ -70,12 +74,31 @@ const Login = () => {
               </div>
               <form>
                 <label htmlFor="usuario" style={{fontWeight: "bold", fontSize: "25px"}}>Usuario:</label>
-                <input type="email" id="usuario" name="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
+                <InputText 
+                  id="usuario" 
+                  name="usuario" 
+                  value={usuario} 
+                  onChange={(e) => setUsuario(e.target.value)} 
+                  style={{fontSize: '20px'}}
+                />
+                {/* <input type="email" id="usuario" name="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} /> */}
 
                 <label htmlFor="password" style={{fontWeight: "bold", fontSize: "25px"}}>Contraseña:</label>
-                <input type="password" id="password" name="password"value={password} onChange={(e) => setPassword(e.target.value)} />
+                <div className="p-field" >
+                  <Password 
+                    id="password" 
+                    name="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    style={{width: '100%',  fontSize: '20px'}}
+                    feedback={false}
+                    toggleMask
+                  />
+                </div>
 
-                <button type='button' className='button_loggin' onClick={Login}>Iniciar Sesión</button>
+
+                {/* <button type='button' className='button_loggin' onClick={Login}>Iniciar Sesión</button> */}
+                <Button label="Iniciar Sesión" onClick={Login} style={{width: '100%'}} />
               </form>
               <div className="login-signup-link">
                 ¿Es tu primera vez? <Link style={{fontWeight: "bold", fontSize: "25px"}} to="/RegistroProfesorPage">Crea tu usuario</Link>

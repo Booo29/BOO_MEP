@@ -70,9 +70,9 @@ const Listas = () => {
                 })
                 .catch(() => {
                     Swal.fire({
-                        icon: "error",
-                        title: "Error al cargar estudiantes",
-                        text: "Ocurrió un error al cargar los estudiantes. Por favor, intente de nuevo.",
+                        icon: "info",
+                        title: "No hay estudiantes cargados",
+                        text: "Esta sección no tiene estudiantes disponibles.",
                         timer: 2000,
                         showConfirmButton: false,
                     });
@@ -335,10 +335,10 @@ const Listas = () => {
             </div>
     
             <DataTable value={estudiantes} className="p-mt-3" stripedRows emptyMessage="No hay estudiantes para mostrar">
-            <Column field="Est_Identificacion" header="Identificación" />
-            <Column field="Est_Nombre" header="Nombre" />
-            <Column field="Est_PrimerApellido" header="Primer Apellido" />
-            <Column field="Est_SegundoApellido" header="Segundo Apellido" />
+            <Column field="Est_Identificacion" header="Identificación" sortable/>
+            <Column field="Est_Nombre" header="Nombre" sortable/>
+            <Column field="Est_PrimerApellido" header="Primer Apellido" sortable/>
+            <Column field="Est_SegundoApellido" header="Segundo Apellido" sortable/>
             <Column
                 body={(rowData) => (
                 <>

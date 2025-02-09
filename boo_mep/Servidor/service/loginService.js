@@ -19,7 +19,7 @@ const PostLogin = (req, res) => {
                 if (results.length > 0) {
                     const comparacion = bcrypt.compareSync(password, results[0].Usu_Clave);
                     if (comparacion) {
-                        const token = jwt.sign({ id: results[0].Usu_Id, profesor: results[0].Prof_Nombre, identificacion: results[0].Prof_Identificacion }, "boomep", {
+                        const token = jwt.sign({ id: results[0].Usu_Id, profesor: `${results[0].Prof_Nombre} ${results[0].Prof_PrimerApellido} ${results[0].Prof_SegundoApellido}`, identificacion: results[0].Prof_Identificacion }, "boomep", {
                             expiresIn: 300
                         });
                         return res.status(200).json({ token: token });

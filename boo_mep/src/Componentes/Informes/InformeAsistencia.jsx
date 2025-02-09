@@ -3,6 +3,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Calendar } from "primereact/calendar";
+import { addLocale } from 'primereact/api';
 import Cookies from 'universal-cookie';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
@@ -36,6 +37,18 @@ const InformeAsistencia = () => {
   const [selectedEstudiante, setSelectedEstudiante] = useState(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+   addLocale('es', {
+          firstDayOfWeek: 1,
+          showMonthAfterYear: true,
+          dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+          dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+          dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+          monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+          monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+          today: 'Hoy',
+          clear: 'Limpiar'
+  });
 
   useEffect(() => {
       const fetchSecciones = async () => {
@@ -242,6 +255,7 @@ const InformeAsistencia = () => {
                 onChange={(e) => setStartDate(e.value)} 
                 placeholder="Fecha de inicio" 
                 style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}      
+                locale='es'
               />
             </div>
 
@@ -251,6 +265,7 @@ const InformeAsistencia = () => {
                 onChange={(e) => setEndDate(e.value)} 
                 placeholder="Fecha de fin" 
                 style={{ width: "100%", fontSize: '16px', fontWeight: 'bold' }}    
+                locale='es'
               />
             </div>
           </div>

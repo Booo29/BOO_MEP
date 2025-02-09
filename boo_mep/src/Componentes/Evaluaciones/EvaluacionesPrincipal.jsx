@@ -203,10 +203,10 @@ const EvaluacionesPrincipal = () => {
                 dataKey="id"
             >
                 <Column expander style={{ width: '3rem' }} />
-                <Column field="nombre" header="Nombre" />
-                <Column field="puntos" header="Puntos" />
-                <Column field="porcentaje" header="Porcentaje" />
-                <Column field="fecha" header="Fecha" />
+                <Column field="nombre" header="Nombre" sortable/>
+                <Column field="puntos" header="Puntos" sortable/>
+                <Column field="porcentaje" header="Porcentaje" sortable/>
+                <Column field="fecha" header="Fecha" sortable/>
 
                 <Column body={(rowData) => (
                     <div style={{ display: "flex", gap: "8px" }}>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
 import { InputTextarea } from 'primereact/inputtextarea';
 import { Calendar } from "primereact/calendar";
+import { addLocale } from 'primereact/api';
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import Swal from "sweetalert2";
@@ -23,6 +23,18 @@ const Cronicas = () => {
     const [visible, setVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
+    addLocale('es', {
+        firstDayOfWeek: 1,
+        showMonthAfterYear: true,
+        dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+        dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+        monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+        monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+        today: 'Hoy',
+        clear: 'Limpiar'
+    });
+
     useEffect(() => {
         loadCronicas();
     }, [cicloId]);
@@ -30,7 +42,6 @@ const Cronicas = () => {
     const loadCronicas = async () => {
         try {
             const data = await GetCronicas(cicloId);
-            console.log(data);
             setCronicas(data);
         } catch (error) {
             console.error("Error loading crónicas", error);
@@ -118,9 +129,13 @@ const Cronicas = () => {
              <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
             <Button label="Agregar Crónica" icon="pi pi-plus" onClick={() => { setVisible(true); setIsEditing(false); }} />
             <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
-            <DataTable value={cronicas} paginator rows={5} emptyMessage="No hay crónicas registradas">
-                <Column field="fecha" header="Fecha" body={(rowData) => new Date(rowData.fecha).toLocaleDateString()} />
-                <Column field="descripcion" header="Descripción" />
+
+            <DataTable value={cronicas} paginator rows={5} emptyMessage="No hay crónicas registradas"  >
+
+                <Column field="fecha" header="Fecha" body={(rowData) => new Date(rowData.fecha).toLocaleDateString()} sortable />
+
+                <Column field="descripcion" header="Descripción" sortable />
+
                 <Column body={(rowData) => (
                     <>
                         <Button icon="pi pi-pencil" className="p-button-rounded p-button-text" onClick={() => openEditDialog(rowData)} />
@@ -137,7 +152,7 @@ const Cronicas = () => {
                     </div>
                     <div className="p-field">
                         <label style={{fontWeight: "bold", fontSize: "25px"}} htmlFor="fecha">Fecha</label>
-                        <Calendar id="fecha" value={cronica.fecha} onChange={(e) => setCronica({ ...cronica, fecha: e.value })} placeholder="Seleccione una Fecha" />
+                        <Calendar id="fecha" value={cronica.fecha} onChange={(e) => setCronica({ ...cronica, fecha: e.value })} placeholder="Seleccione una Fecha" locale="es" />
                     </div>
                     <div className="p-d-flex p-jc-end">
                         <Button label="Guardar" className="p-button-raised" onClick={saveCronica} />

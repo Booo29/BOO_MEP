@@ -3,6 +3,7 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Calendar } from "primereact/calendar";
+import { addLocale } from 'primereact/api';
 import { Column } from "primereact/column";
 import { getCiclos, postCiclo, putCiclo, deleteCiclo } from "../../Servicios/CicloService";
 
@@ -14,6 +15,19 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
   
   const [fechaInicio, setFechaInicio] = useState("");
   const [fechaFin, setFechaFin] = useState("");
+
+  
+  addLocale('es', {
+          firstDayOfWeek: 1,
+          showMonthAfterYear: true,
+          dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+          dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+          dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+          monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+          monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+          today: 'Hoy',
+          clear: 'Limpiar'
+  });
 
 
   useEffect(() => {
@@ -115,8 +129,8 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
           {/* Tabla de Ciclos */}
           <DataTable value={ciclos} paginator rows={10}>
             <Column field="id" header="ID" />
-            <Column header="Fecha de Inicio" body={(rowData) => formatFecha(rowData, 'fechaInicio')} />
-            <Column header="Fecha de Fin" body={(rowData) => formatFecha(rowData, 'fechaFin')} />
+            <Column header="Fecha de Inicio" body={(rowData) => formatFecha(rowData, 'fechaInicio')} sortable/>
+            <Column header="Fecha de Fin" body={(rowData) => formatFecha(rowData, 'fechaFin')} sortable/>
             <Column body={renderTableActions} header="Acciones" />
           </DataTable>
         </div>
@@ -129,11 +143,11 @@ const CiclosManager = ({ idInstitucion, visible, onClose }) => {
           <form onSubmit={(e) => { e.preventDefault(); handleSaveCiclo(); }}>
             <div className="p-field">
               <label htmlFor="fechaInicio">Fecha de Inicio</label>
-              <Calendar id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required />
+              <Calendar id="fechaInicio" type="date" className="p-inputtext" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} required locale="es"/>
             </div>
             <div className="p-field">
               <label htmlFor="fechaFin">Fecha de Fin</label>
-              <Calendar id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required />
+              <Calendar id="fechaFin" type="date" className="p-inputtext" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} required locale="es"/>
             </div>
             <Button label="Guardar" type="submit" />
           </form>

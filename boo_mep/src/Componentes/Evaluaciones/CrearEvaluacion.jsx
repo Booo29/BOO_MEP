@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
+import { addLocale } from 'primereact/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import {PostEvaluaciones} from '../../Servicios/EvaluacionService';
@@ -27,6 +28,18 @@ const CrearEvaluacion = () => {
         fecha: null,
         indicadores: [],
         nivelesDesempeno: []
+    });
+
+    addLocale('es', {
+            firstDayOfWeek: 1,
+            showMonthAfterYear: true,
+            dayNames: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+            dayNamesShort: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+            dayNamesMin: ['D', 'L', 'M', 'MI', 'J', 'V', 'S'],
+            monthNames: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+            monthNamesShort: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'],
+            today: 'Hoy',
+            clear: 'Limpiar'
     });
 
     const handleInputChange = (e) => {
@@ -102,7 +115,7 @@ const CrearEvaluacion = () => {
                         </div>
                         <div className="p-field">
                             <label htmlFor="fecha" style={{fontWeight: "bold", fontSize: "25px"}}>Fecha</label>
-                            <Calendar id="fecha" name="fecha" value={evaluacion.fecha} onChange={handleDateChange} />
+                            <Calendar id="fecha" name="fecha" value={evaluacion.fecha} onChange={handleDateChange} locale='es'/>
                         </div>
                         <button type="submit" className="p-button p-component p-button-text-icon-left">
                             <span className="p-button-icon-left pi pi-save"></span>

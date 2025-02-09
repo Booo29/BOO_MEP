@@ -75,6 +75,7 @@ const EvaluacionEstudiante = () => {
                 selectedSeccion.Gra_Nombre,
                 periodoId
             );
+            console.log("evaluaciones", evaluaciones);
             setEvaluaciones(evaluaciones);
         }
         catch(error){
@@ -120,11 +121,12 @@ const EvaluacionEstudiante = () => {
         if (field === "notaFinal" && newValue > 100) {
             newValue = 100;
         }
-    
 
-    updatedEstudiantes[index][field] = newValue;
+        updatedEstudiantes[index][field] = newValue;
+   
     updatedEstudiantes[index].evaluacion.notaFinal = (updatedEstudiantes[index].evaluacion.puntosObtenidos * 100) / selectedEvaluacion.puntos;
-    console.log("estudiante actualizado", updatedEstudiantes);
+    updatedEstudiantes[index].evaluacion.porcentajeObtenido = ((updatedEstudiantes[index].evaluacion.notaFinal * selectedEvaluacion.porcentaje) / 100);
+
     setEstudiantes(updatedEstudiantes);
 };
 
@@ -133,9 +135,10 @@ const applyGlobalValues = () => {
         ...student,
         evaluacion: {
             ...student.evaluacion,
-            porcentajeObtenido: porcentajeGlobal > selectedEvaluacion.porcentaje ? selectedEvaluacion.porcentaje : porcentajeGlobal,
+            // porcentajeObtenido: porcentajeGlobal > selectedEvaluacion.porcentaje ? selectedEvaluacion.porcentaje : porcentajeGlobal,
             puntosObtenidos: notaGlobal > selectedEvaluacion.puntos ? selectedEvaluacion.puntos : notaGlobal,
-            notaFinal: (notaGlobal * 100) / selectedEvaluacion.puntos
+            notaFinal: (notaGlobal * 100) / selectedEvaluacion.puntos,
+            porcentajeObtenido: (((notaGlobal * 100) / selectedEvaluacion.puntos) * (selectedEvaluacion.porcentaje / 100))
         }
     }));
 
@@ -225,8 +228,9 @@ const applyGlobalValues = () => {
                 />
             ))}
 
-            <Column header="% Obtenido" rowSpan={2} />
             <Column header="Puntos Obtenidos" rowSpan={2} />
+            <Column header="% Obtenido" rowSpan={2} />
+            
             <Column header="Nota Final" rowSpan={2} />
         </Row>
 
@@ -283,7 +287,7 @@ const applyGlobalValues = () => {
 
       <div style={{ marginBottom: "16px" }}>
         <p style={{ fontSize: "18px", fontWeight: "bold", textAlign: "center" }}>
-            Aquí puedes ingresar los puntos globales y el porcentaje global que se aplicará a todos los estudiantes.
+            Aquí puedes ingresar los puntos globales para que se les aplique a todos los estudiantes.
         </p>
       </div>
 
@@ -296,14 +300,6 @@ const applyGlobalValues = () => {
                 style={{ width: '100%' }}
             />
         </div>
-        <div style={{ flex: 1 }}>     
-            <InputNumber
-                value={porcentajeGlobal}
-                onChange={(e) => setPorcentajeGlobal(e.value)}
-                placeholder="Porcentaje Global"
-                style={{ width: '100%' }}
-            />
-        </div>
             
       </div>
 
@@ -312,10 +308,10 @@ const applyGlobalValues = () => {
       <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
 
       <DataTable showGridlines  value={estudiantes} editMode="cell" stripedRows emptyMessage="No hay estudiantes para mostrar" headerColumnGroup={headerGroup}  scrollable scrollHeight="500px" >
-        <Column field="identificacion" />
-        <Column field="nombre" />
-        <Column field="primerApellido" />
-        <Column field="segundoApellido" />
+        <Column field="identificacion" sortable/>
+        <Column field="nombre" sortable/>
+        <Column field="primerApellido" sortable/>
+        <Column field="segundoApellido" sortable/>
 
         <Column field="porcentaje"  body={() => selectedEvaluacion?.porcentaje}/>
         <Column field="puntos"  body={() => selectedEvaluacion?.puntos}/>
@@ -348,10 +344,11 @@ const applyGlobalValues = () => {
                                 mode="decimal"
                             />
                         );
-                    }}
+                    }} 
                     onCellEditComplete={(e) => {
                         let { rowData, newValue, field } = e;
                         let updatedEstudiantes = [...estudiantes];
+
                         let index = updatedEstudiantes.findIndex(student => student.id === rowData.id);
                         
                         if (index === -1) return; // Si no se encuentra el estudiante, salimos
@@ -367,12 +364,37 @@ const applyGlobalValues = () => {
                             indicadores[indicadorIndex].nota = newValue;
                         }
 
+                        //Se suma cada indicador para obtener el total de puntos obtenidos
+
+                        let puntosObtenidos = indicadores.reduce((acc, ind) => acc + ind.nota, 0);
+                    
+                        let notaFinal = (puntosObtenidos * 100 ) / selectedEvaluacion.puntos;
+
+                        let porcentajeObtenido = (notaFinal * selectedEvaluacion.porcentaje) / 100;
+
+                        updatedEstudiantes[index].evaluacion.puntosObtenidos = puntosObtenidos;
+
+                        updatedEstudiantes[index].evaluacion.porcentajeObtenido = porcentajeObtenido;
+
+                        updatedEstudiantes[index].evaluacion.notaFinal = notaFinal;
+
                         updatedEstudiantes[index].indicadores = indicadores;
+                        
                         setEstudiantes(updatedEstudiantes); // Actualizamos el estado con los estudiantes modificados
                     }}
                 />
             );
         })}
+
+        <Column field="evaluacion.puntosObtenidos" editor={(options) => (
+            <InputNumber 
+                value={options.value} 
+                onValueChange={(e) => options.editorCallback(e.value)} 
+                min={0} 
+                max={selectedEvaluacion?.puntos} 
+                mode="decimal"
+            />
+        )} onCellEditComplete={onCellEditComplete} />       
 
 
         <Column field="evaluacion.porcentajeObtenido"  editor={(options) => (
@@ -388,15 +410,6 @@ const applyGlobalValues = () => {
         onCellEditComplete={onCellEditComplete} 
         />
 
-        <Column field="evaluacion.puntosObtenidos" editor={(options) => (
-            <InputNumber 
-                value={options.value} 
-                onValueChange={(e) => options.editorCallback(e.value)} 
-                min={0} 
-                max={selectedEvaluacion?.puntos} 
-                mode="decimal"
-            />
-        )} onCellEditComplete={onCellEditComplete} />
 
         <Column field="evaluacion.notaFinal" editor={(options) => (
             <InputNumber 

@@ -100,6 +100,7 @@ const FormularioRegistro = () => {
                             onChange={handleInputChange}
                             className={errors.password ? 'p-invalid' : ''}
                             feedback={false}
+                            toggleMask
                         />
                         {errors.password && <small className="p-error">{errors.password}</small>}
                     </div>
