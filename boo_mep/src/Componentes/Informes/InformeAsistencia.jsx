@@ -109,6 +109,8 @@ const InformeAsistencia = () => {
         fechas_presente: dato.Fechas_Presente,
         total_ausente: dato.Total_Ausente,
         fechas_ausente: dato.Fechas_Ausente,
+        total_tardia: dato.Total_Tarde,
+        fechas_tardia: dato.Fechas_Tarde,
         total_justificada: dato.Total_Ausente_Justificado,
         fechas_justificada: dato.Fechas_Ausente_Justificado ,
       }));
@@ -133,6 +135,8 @@ const InformeAsistencia = () => {
         fechas_presente: dato.Fechas_Presente,
         total_ausente: dato.Total_Ausente,
         fechas_ausente: dato.Fechas_Ausente,
+        total_tardia: dato.Total_Tarde,
+        fechas_tardia: dato.Fechas_Tarde,
         total_justificada: dato.Total_Ausente_Justificado,
         fechas_justificada: dato.Fechas_Ausente_Justificado ,
       }));

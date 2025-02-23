@@ -11,6 +11,7 @@ import Informes from "../../Recursos/icono_informe.png";
 import Tutoriales from "../../Recursos/icono_tutorial.png";
 import Cronicas from "../../Recursos/icono_cronica.png";
 import Eliminar from "../../Recursos/icono_eliminar.png";
+import EditarSecciones from "../../Recursos/icono_EditarSecciones.png";
 
 
 const Menu = () => {
@@ -53,6 +54,13 @@ const Menu = () => {
             imagen: Cronicas,           
             color: "#ea639a",
             onClick: () => navigate("/CronicasPage"),
+        },
+
+        {
+            nombre: "Editar Secciones",
+            imagen: EditarSecciones,           
+            color: "#3941eb",
+            onClick: () => navigate("/EditarSeccionesPage"),
         },
 
         {

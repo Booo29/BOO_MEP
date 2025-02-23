@@ -22,11 +22,13 @@ const GetInformeAsistencia = (req, res) => {
         -- Contar la cantidad de asistencias por tipo
             SUM(CASE WHEN a.Asi_Asistencia = 'Presente' THEN 1 ELSE 0 END) AS Total_Presente,
             SUM(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN 1 ELSE 0 END) AS Total_Ausente,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN 1 ELSE 0 END) AS Total_Tarde,
             SUM(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN 1 ELSE 0 END) AS Total_Ausente_Justificado,
 
         -- Concatenar fechas de cada tipo de asistencia
             COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Presente,
             COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente,
+            COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Tarde,
             COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente_Justificado
 
       FROM asistencia a

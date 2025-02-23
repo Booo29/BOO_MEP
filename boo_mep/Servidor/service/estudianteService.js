@@ -9,7 +9,7 @@ const PostEstudiantes = (req, res) => {
     // Verificar que los datos tengan la estructura correcta
     for (const estudiante of estudiantes) {
         const { Est_Identificacion, Est_Nombre, Est_PrimerApellido, Est_SegundoApellido, Grado_Seccion_Id_Grado_Seccion } = estudiante;
-        if (!Est_Identificacion || !Est_Nombre || !Est_PrimerApellido || !Est_SegundoApellido || !Grado_Seccion_Id_Grado_Seccion) {
+        if (!Est_Identificacion || !Est_Nombre || !Grado_Seccion_Id_Grado_Seccion) {
             return res.status(400).send("Todos los campos son obligatorios: Est_Identificacion, Est_Nombre, Est_PrimerApellido, Est_SegundoApellido, Grado_Seccion_Id_Grado_Seccion.");
         }
     }

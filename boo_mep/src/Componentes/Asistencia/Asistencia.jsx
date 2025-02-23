@@ -288,6 +288,7 @@ const Asistencia = () => {
                 options={[
                   { label: "Presente", value: "Presente" },
                   { label: "Ausente", value: "Ausente" },
+                  {label: "Tardia", value: "Tardia"},
                   { label: "Ausente Justificado", value: "Ausente Justificado" },
                 ]}
                 onChange={(e) => handleEstadoChange(rowData.id, e.value)}

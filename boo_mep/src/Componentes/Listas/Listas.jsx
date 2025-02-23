@@ -197,7 +197,7 @@ const Listas = () => {
 
         const columnMapping = {
             identificacion: ["identificación", "id", "cedula", "cédula", "identificacion", "Cédula", "Identificación", "ID", "Cedula", "Identificacion"],
-            nombre: ["primer nombre", "nombre1", "nombre", "Nombre", "Nombre1", "Primer nombre", "Primer Nombre"],
+            nombre: ["primer nombre", "nombre1", "nombre", "Nombre", "Nombre1", "Primer nombre", "Primer Nombre", "Nombre Completo", "nombre completo", "Nombre completo"],
             primerApellido: ["primer apellido", "apellido1", "apellido", "Apellido", "Apellido1", "Primer apellido", "Primer Apellido"],
             segundoApellido: ["segundo apellido", "apellido2", "Apellido2", "Segundo apellido", "Segundo Apellido"],
         };
