@@ -26,10 +26,10 @@ const GetInformeAsistencia = (req, res) => {
             SUM(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN 1 ELSE 0 END) AS Total_Ausente_Justificado,
 
         -- Concatenar fechas de cada tipo de asistencia
-            COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Presente,
-            COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente,
-            COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Tarde,
-            COALESCE(GROUP_CONCAT(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente_Justificado
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Presente,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Tarde,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente_Justificado
 
       FROM asistencia a
       JOIN estudiantes e ON a.Estudiantes_Est_Id = e.Est_Id
@@ -37,6 +37,7 @@ const GetInformeAsistencia = (req, res) => {
       JOIN materias m ON mgs.Materias_Mat_Id = m.Mat_Id
       WHERE 
           (e.Est_Id = ? OR ? IS NULL)
+          AND e.Est_Estado = 'A'
           AND e.Grado_Seccion_Id_Grado_Seccion = ?
           AND a.Asi_Fecha BETWEEN ? AND ?
     
@@ -97,6 +98,7 @@ const GetInformeNotas = (req, res) => {
       INNER JOIN materias m ON mgs.Materias_Mat_Id = m.Mat_Id
       WHERE 
           (e.Est_Id = ? OR ? IS NULL)
+          AND e.Est_Estado = 'A'
           AND gs.Id_Grado_Seccion = ?
           AND p.Per_Id = ?
     `;

@@ -3,9 +3,58 @@ const path = require('path');
 const { spawn } = require('child_process');
 const express = require('express'); 
 const { autoUpdater } = require('electron-updater');
+const mysql = require('mysql');
 
 let mainWindow;
 
+function updateDatabase() {
+  const connection = mysql.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'una',
+    database: 'boo_mep',
+    multipleStatements: true
+  });
+
+  connection.connect((err) => {
+    if (err) {
+      console.log("Error al conectar con la base de datos", err);
+      return;
+    }
+    console.log("Conexión exitosa con la DB");
+
+    // Verificar si la columna Asi_Sesion existe
+    connection.query(
+      "SHOW COLUMNS FROM asistencia LIKE 'Asi_Sesion'", 
+      (err, results) => {
+        if (err) {
+          console.error("Error verificando la base de datos:", err);
+          connection.end();
+          return;
+        }
+
+        if (results.length === 0) {
+          console.log("La columna 'Asi_Sesion' no existe. Agregando...");
+
+          connection.query(
+            "ALTER TABLE asistencia ADD COLUMN Asi_Sesion INT DEFAULT 1 NOT NULL", 
+            (err) => {
+              if (err) {
+                console.error("Error al agregar la columna 'Asi_Sesion':", err);
+              } else {
+                console.log("Columna 'Asi_Sesion' agregada correctamente.");
+              }
+              connection.end(); // Cerrar la conexión después de la consulta
+            }
+          );
+        } else {
+          console.log("La columna 'Asi_Sesion' ya existe. No se realizaron cambios.");
+          connection.end(); // Cerrar la conexión si la columna ya existe
+        }
+      }
+    );
+  });
+}
 
 function startExpressServer() {
   const expressApp = express();
@@ -85,6 +134,8 @@ autoUpdater.on('update-downloaded', () => {
 
 
 app.whenReady().then(() => {
+
+  updateDatabase();
 
   startBackend();
 

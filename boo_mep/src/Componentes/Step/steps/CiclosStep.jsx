@@ -7,9 +7,12 @@ import { postCiclo } from "../../../Servicios/CicloService";
 import useStore from "../../../store/store";
 import useCicloStore from "../../../store/CicloStore";
 import Swal from "sweetalert2";
+import { useNavigate } from 'react-router-dom';
 
 const CiclosStep = () => {
   
+  const navigate = useNavigate();
+
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
 
@@ -82,9 +85,14 @@ const CiclosStep = () => {
     }
   };
 
+  const handleMenu = () => {
+    navigate('/InstitucionesPage');
+  };
+
 
   return (
-    <div>
+    <div style={{ padding: "16px" }}>
+       <Button label="Regresar a las Instituciones" severity="help" onClick={handleMenu} style={{marginBottom: "20px"}}/>
         <div>
           <form onSubmit={(e) => { e.preventDefault()}}>
             <div className="p-field">

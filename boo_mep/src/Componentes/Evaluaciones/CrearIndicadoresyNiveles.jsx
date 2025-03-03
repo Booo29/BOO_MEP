@@ -116,7 +116,16 @@ const CrearIndicadoresyNiveles = () => {
         <div>
             <h2 style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '24px' }}>Gestión de Indicadores</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <MultiSelect value={selectedIndicadores} options={indicadores} onChange={handleIndicadorSelect} optionLabel="Ind_Nombre" placeholder="Selecciona Indicadores" />
+                <MultiSelect 
+                    value={selectedIndicadores} 
+                    options={indicadores} 
+                    onChange={handleIndicadorSelect} 
+                    optionLabel="Ind_Nombre" 
+                    placeholder="Selecciona Indicadores" 
+                    style={{ width: '50%' }}
+                    display="chip" 
+                    filter 
+                />
                 <Button label="Crear Indicador" onClick={() => setVisibleIndicador(true)} />
                 <Button label="Crear Nivel de Desempeño" onClick={() => setVisibleNivel(true)} />
             </div>

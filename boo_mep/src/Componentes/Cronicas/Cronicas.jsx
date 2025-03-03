@@ -9,19 +9,26 @@ import { Column } from "primereact/column";
 import Swal from "sweetalert2";
 import { useNavigate } from 'react-router-dom';
 import { GetCronicas, PostCronica, PutCronica, DeleteCronica } from "../../Servicios/CronicasService";
-
+import {getInstitucionbyId} from '../../Servicios/InstitucionService';
 import useCicloStore from "../../store/CicloStore";
+import Cookies from 'universal-cookie';
+import { jwtDecode } from "jwt-decode";
+import {GenerarDocumento} from '../Informes/GenerarDocumento';
+import useStore from "../../store/store";
 
 const Cronicas = () => {
 
     const cicloId = useCicloStore((state) => state.cicloId);
+    const institutionId = useStore((state) => state.institutionId);
 
     const navigate = useNavigate();
+    const cookies = new Cookies();  
 
     const [cronicas, setCronicas] = useState([]);
     const [cronica, setCronica] = useState({ descripcion: "", fecha: null });
     const [visible, setVisible] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [institucion, setInstitucion] = useState(null);
 
     addLocale('es', {
         firstDayOfWeek: 1,
@@ -43,6 +50,8 @@ const Cronicas = () => {
         try {
             const data = await GetCronicas(cicloId);
             setCronicas(data);
+            const institucion = await getInstitucionbyId(institutionId);
+            setInstitucion(institucion);
         } catch (error) {
             console.error("Error loading crónicas", error);
         }
@@ -118,6 +127,18 @@ const Cronicas = () => {
         setVisible(true);
     };
 
+    const handlePrint = (rowData) => {
+        const datosInforme = {
+            fechaHoy: new Date().toISOString().split("T")[0],
+            profesor: `${jwtDecode(cookies.get("token")).profesor}`,
+            institucion: institucion.Inst_Nombre,
+            fecha: new Date(rowData.fecha).toISOString().split("T")[0],
+            descripcion: rowData.descripcion,
+        };
+
+        GenerarDocumento("CRONICA.docx", datosInforme, "CRONICA");
+    };
+
     const handleMenu = () => {
         navigate('/MenuPage');
       };
@@ -130,16 +151,26 @@ const Cronicas = () => {
             <Button label="Agregar Crónica" icon="pi pi-plus" onClick={() => { setVisible(true); setIsEditing(false); }} />
             <div style={{ borderTop: "1px solid #ccc", margin: "20px 0" }}></div>
 
-            <DataTable value={cronicas} paginator rows={5} emptyMessage="No hay crónicas registradas"  >
+            <DataTable value={cronicas} paginator rows={5} emptyMessage="No hay crónicas registradas" stripedRows  >
 
                 <Column field="fecha" header="Fecha" body={(rowData) => new Date(rowData.fecha).toLocaleDateString()} sortable />
 
-                <Column field="descripcion" header="Descripción" sortable />
+                <Column 
+                    field="descripcion" 
+                    header="Descripción" 
+                    sortable 
+                    body={(rowData) => (
+                        <div style={{maxWidth: "1500px", whiteSpace: "normal", wordBreak: "break-word", overflow: "hidden"}} >
+                            {rowData.descripcion}
+                        </div>
+                    )}     
+                />
 
-                <Column body={(rowData) => (
+                <Column header="Acciones" body={(rowData) => (
                     <>
                         <Button icon="pi pi-pencil" className="p-button-rounded p-button-text" onClick={() => openEditDialog(rowData)} />
                         <Button icon="pi pi-trash" className="p-button-rounded p-button-text p-button-danger" onClick={() => deleteCronica(rowData.id)} />
+                        <Button icon="pi pi-print" className="p-button-rounded p-button-text p-button-success" onClick={() => handlePrint(rowData)} />
                     </>
                 )} />
             </DataTable>

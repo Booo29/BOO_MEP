@@ -27,8 +27,9 @@ const PostAsistencia = (req, res) => {
                 Asi_Justificacion, 
                 Materia_grado_seccion_Mat_gra_sec_Id, 
                 Estudiantes_Est_Id, 
-                Periodo_Per_Id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                Periodo_Per_Id,
+                Asi_Sesion
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         // Promesa para manejar cada inserción
@@ -41,6 +42,7 @@ const PostAsistencia = (req, res) => {
                 Materia_grado_seccion_Mat_gra_sec_Id,
                 Estudiantes_Est_Id,
                 Periodo_Per_Id,
+                Asi_Sesion,
             } = asistencia;
 
             return new Promise((resolve, reject) => {
@@ -54,6 +56,7 @@ const PostAsistencia = (req, res) => {
                         Materia_grado_seccion_Mat_gra_sec_Id,
                         Estudiantes_Est_Id,
                         Periodo_Per_Id,
+                        Asi_Sesion,
                     ],
                     (err, results) => {
                         if (err) return reject(err);
@@ -107,7 +110,8 @@ const GetAsistencia = (req, res) => {
             a.Asi_Fecha,
             a.Asi_Leccion,
             a.Asi_Asistencia,
-            a.Asi_Justificacion
+            a.Asi_Justificacion,
+            a.Asi_Sesion
         FROM 
             estudiantes e
         LEFT JOIN 
