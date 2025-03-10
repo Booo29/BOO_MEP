@@ -20,10 +20,10 @@ const GetInformeAsistencia = (req, res) => {
           a.Asi_Asistencia,
           a.Asi_Leccion,
         -- Contar la cantidad de asistencias por tipo
-            SUM(CASE WHEN a.Asi_Asistencia = 'Presente' THEN 1 ELSE 0 END) AS Total_Presente,
-            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN 1 ELSE 0 END) AS Total_Ausente,
-            SUM(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN 1 ELSE 0 END) AS Total_Tarde,
-            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN 1 ELSE 0 END) AS Total_Ausente_Justificado,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Leccion ELSE 0 END) AS Total_Presente,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Leccion ELSE 0 END) AS Total_Ausente,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Leccion ELSE 0 END) AS Total_Tarde,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Leccion ELSE 0 END) AS Total_Ausente_Justificado,
 
         -- Concatenar fechas de cada tipo de asistencia
             COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Presente,
@@ -99,6 +99,7 @@ const GetInformeNotas = (req, res) => {
       WHERE 
           (e.Est_Id = ? OR ? IS NULL)
           AND e.Est_Estado = 'A'
+          AND ev.Eva_Estado = 'A'
           AND gs.Id_Grado_Seccion = ?
           AND p.Per_Id = ?
     `;

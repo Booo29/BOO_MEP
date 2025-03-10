@@ -145,25 +145,57 @@ const InformeAsistencia = () => {
     }
     if(selectedReportType === 'InformeNotasGrupal'){
       const informe = await GetInformeNotasSeccion(selectedSeccion, periodoId);
+
+      const estudiantesMap = new Map();
+
+      informe.forEach((dato) => {
+        if (!estudiantesMap.has(dato.Est_Identificacion)) {
+          estudiantesMap.set(dato.Est_Identificacion, {
+            identificacion: dato.Est_Identificacion,
+            nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
+            materias: [],
+          });
+        }
+
+        estudiantesMap.get(dato.Est_Identificacion).materias.push({
+          materia: dato.Materia,
+          evaluacion: dato.Evaluacion,
+          porcentaje_evaluacion: dato.Porcentaje_Evaluacion,
+          puntos_evaluacion: dato.Puntos_Evaluacion,
+          porcentaje_obtenido: dato.Porcentaje_Obtenido,
+          puntos_obtenidos: dato.Puntos_Obtenidos,
+          nota: dato.Nota_Final,
+        });
+      });
+
       const datosInforme = {
-        fechaHoy : new Date().toISOString().split("T")[0],
-        nombre: `${informe[0].Est_Nombre} ${informe[0].Est_PrimerApellido} ${informe[0].Est_SegundoApellido}`,
+        fechaHoy: new Date().toISOString().split("T")[0],
         seccion: secciones.find((seccion) => seccion.value === selectedSeccion).label,
         institucion: institucion.Inst_Nombre,
         profesor: `${jwtDecode(cookies.get("token")).profesor}`,
+        datos: Array.from(estudiantesMap.values()), // Convertir Map a Array
       };
 
-      datosInforme.datos = informe.map((dato) => ({
-        identificacion: dato.Est_Identificacion,
-        nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
-        materia: dato.Materia,
-        evaluacion: dato.Evaluacion,
-        porcentaje_evaluacion: dato.Porcentaje_Evaluacion,
-        puntos_evaluacion: dato.Puntos_Evaluacion,
-        porcentaje_obtenido: dato.Porcentaje_Obtenido,
-        puntos_obtenidos: dato.Puntos_Obtenidos,
-        nota: dato.Nota_Final,
-      }));
+
+      // const datosInforme = {
+      //   fechaHoy : new Date().toISOString().split("T")[0],
+      //   nombre: `${informe[0].Est_Nombre} ${informe[0].Est_PrimerApellido} ${informe[0].Est_SegundoApellido}`,
+      //   seccion: secciones.find((seccion) => seccion.value === selectedSeccion).label,
+      //   institucion: institucion.Inst_Nombre,
+      //   profesor: `${jwtDecode(cookies.get("token")).profesor}`,
+      // };
+
+      // datosInforme.datos = informe.map((dato) => ({
+      //   identificacion: dato.Est_Identificacion,
+      //   nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
+      //   materia: dato.Materia,
+      //   evaluacion: dato.Evaluacion,
+      //   porcentaje_evaluacion: dato.Porcentaje_Evaluacion,
+      //   puntos_evaluacion: dato.Puntos_Evaluacion,
+      //   porcentaje_obtenido: dato.Porcentaje_Obtenido,
+      //   puntos_obtenidos: dato.Puntos_Obtenidos,
+      //   nota: dato.Nota_Final,
+      // }));
 
       GenerarDocumento('REPORTENOTAGRUPAL.docx', datosInforme, 'Reporte de notas grupal');
 

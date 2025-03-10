@@ -233,14 +233,24 @@ const Asistencia = () => {
     });
 
     if (asistenciasNuevas.length > 0) {
-
-
       await postAsistencia(asistenciasNuevas);
+
+      //Limpiar la pantalla de Asistencia
+      setEstudiantesSesion([]);
+      setEstudiantes([]);
+      setSesiones([]);
+      setSesionSeleccionada(null);
+      setFecha(null);
+      setMateria(null);
+      setSeccion(null);
+
+      
     }
 
     if (asistenciasActualizar.length > 0) {
 
        await putAsistencia(asistenciasActualizar);
+      
     }
       toast.current.show({
         severity: "success",
