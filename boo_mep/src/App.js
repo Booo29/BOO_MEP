@@ -3,6 +3,7 @@ import React from 'react';
 
 import LoginPage from "./Paginas/LoginPage";
 import RegistroProfesorPage from "./Paginas/RegistroProfesorPage";
+import RecuperarContrasenaPage from "./Paginas/RecuperarContrasenaPage";
 import MenuPage from "./Paginas/MenuPage";
 import InstitucionesPage from "./Paginas/InstitucionPage";
 import StepsFormPage from "./Paginas/StepsFormPage";
@@ -25,6 +26,7 @@ export function App() {
           <Route path="/" element={<LoginPage />} />
           <Route path="/LoginPage" element={<LoginPage />} />
           <Route path="/RegistroProfesorPage" element={<RegistroProfesorPage />} />
+          <Route path="/RecuperarContrasenaPage" element={<RecuperarContrasenaPage />} />
           <Route path="/MenuPage" element={<MenuPage />} />
           <Route path="/InstitucionesPage" element={<InstitucionesPage />} />
           <Route path="/StepsFormPage" element={<StepsFormPage />} />
