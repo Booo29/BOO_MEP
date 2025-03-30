@@ -7,7 +7,7 @@ const { connection } = require("../config");
 
 const GetNivelesDesempeno = (req, res) => {
     const query = `
-        SELECT * FROM Niveles_desempeno
+        SELECT * FROM Niveles_desempeno ORDER BY Niv_Id DESC
     `;
 
     connection.query(query, (err, rows) => {
@@ -70,7 +70,7 @@ const PostNivelesDesempeno = (req, res) => {
 
 const GetIndicadores = (req, res) => {
     const query = `
-        SELECT * FROM Indicadores
+        SELECT * FROM Indicadores ORDER BY Ind_Id DESC
     `;
 
     connection.query(query, (err, rows) => {

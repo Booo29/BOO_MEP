@@ -122,7 +122,67 @@ const GetInformeNotas = (req, res) => {
 
 }
 
+
+const GetTotalAsistencia = (req, res) => {
+
+    try{
+
+    const {seccionId, estudianteId, periodoID} = req.query;
+
+    const query = `
+      SELECT 
+          e.Est_Id,
+          e.Est_Identificacion,
+          e.Est_Nombre,
+          e.Est_PrimerApellido,
+          e.Est_SegundoApellido,
+          m.Mat_Nombre,
+          a.Asi_Asistencia,
+          a.Asi_Leccion,
+        -- Contar la cantidad de asistencias por tipo
+            SUM(CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Leccion ELSE 0 END) AS Total_Presente,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Leccion ELSE 0 END) AS Total_Ausente,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Leccion ELSE 0 END) AS Total_Tarde,
+            SUM(CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Leccion ELSE 0 END) AS Total_Ausente_Justificado,
+
+        -- Concatenar fechas de cada tipo de asistencia
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Presente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Presente,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Ausente' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Tardia' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Tarde,
+            COALESCE(GROUP_CONCAT(DISTINCT CASE WHEN a.Asi_Asistencia = 'Ausente Justificado' THEN a.Asi_Fecha ELSE NULL END ORDER BY a.Asi_Fecha ASC SEPARATOR ', '), 'Sin registros') AS Fechas_Ausente_Justificado
+
+      FROM asistencia a
+      JOIN estudiantes e ON a.Estudiantes_Est_Id = e.Est_Id
+      JOIN materia_grado_seccion mgs ON a.Materia_grado_seccion_Mat_gra_sec_Id = mgs.Mat_gra_sec_Id
+      JOIN materias m ON mgs.Materias_Mat_Id = m.Mat_Id
+      WHERE 
+          (e.Est_Id = ? OR ? IS NULL)
+          AND e.Est_Estado = 'A'
+          AND e.Grado_Seccion_Id_Grado_Seccion = ?
+          AND a.Periodo_Per_Id = ?
+    
+      GROUP BY e.Est_Id, m.Mat_Nombre 
+      ORDER BY e.Est_Id, m.Mat_Nombre;
+    `;
+
+    const params = [estudianteId, estudianteId, seccionId, periodoID];
+
+    connection.query(query, params, (error, results) => {
+        if (error) {
+            console.log(error);
+            return res.status(500).send("Error al obtener informe de asistencia");
+        }
+        return res.status(200).send(results);
+    });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Error al obtener informe de asistencia");
+    }
+}
+
 app.get("/informe/asistencia", GetInformeAsistencia);
 app.get("/informe/notas", GetInformeNotas);
+app.get("/informe/asistencia/total", GetTotalAsistencia);
 
 module.exports = app;

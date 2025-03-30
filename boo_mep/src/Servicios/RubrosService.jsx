@@ -32,3 +32,20 @@ export const postRubrosConfigurados = async (datos) => {
         throw error;
     }
 }
+
+export const getRubrosConfigurados = async (periodoID, grado, materia) => {
+    try {
+        const response = await axios.get('http://localhost:3000/rubros/configurados', {
+            params: {
+                periodoID,
+                grado,
+                materia
+            }
+        });
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

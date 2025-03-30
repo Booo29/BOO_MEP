@@ -53,7 +53,10 @@ const CrearIndicadoresyNiveles = () => {
     const handleNivelSelect = (e, rowData) => {
         const updatedTable = tableData.map(row =>
             row.Ind_Id === rowData.Ind_Id
-                ? { ...row, selectedNiveles: e.value, nivelesInfo: e.value.map(n => n.Niv_Nivel).join(', ') }
+                ? { 
+                    ...row, 
+                    selectedNiveles: e.value, 
+                    nivelesInfo: e.value.map(n => `${n.Niv_Nivel}: ${n.Niv_Descripcion}`).join('\n') }
                 : row
         );
         setTableData(updatedTable);
@@ -120,7 +123,7 @@ const CrearIndicadoresyNiveles = () => {
                     value={selectedIndicadores} 
                     options={indicadores} 
                     onChange={handleIndicadorSelect} 
-                    optionLabel="Ind_Nombre" 
+                    optionLabel={n => n.Ind_Nombre.length > 100 ? n.Ind_Nombre.substring(0, 100) + "..." : n.Ind_Nombre}
                     placeholder="Selecciona Indicadores" 
                     style={{ width: '50%' }}
                     display="chip" 
@@ -130,11 +133,25 @@ const CrearIndicadoresyNiveles = () => {
                 <Button label="Crear Nivel de Desempeño" onClick={() => setVisibleNivel(true)} />
             </div>
             <DataTable value={tableData} style={{ marginTop: '20px' }} emptyMessage="No hay indicadores ingresados" stripedRows>
-                <Column field="Ind_Nombre" header="Nombre del Indicador" />
-                <Column field="selectedNiveles" header="Niveles de Desempeño" body={rowData => (
-                    <MultiSelect value={rowData.selectedNiveles} options={nivelesDesempeno} onChange={(e) => handleNivelSelect(e, rowData)} optionLabel="Niv_Nivel" placeholder="Selecciona Niveles" />
-                )} />
-                <Column field="nivelesInfo" header="Información de Niveles" />
+                <Column field="Ind_Nombre" header="Nombre del Indicador" style={{maxWidth: '600px'}} />
+                <Column 
+                    field="selectedNiveles" 
+                    header="Niveles de Desempeño" 
+                    style={{ maxWidth: '500px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }} 
+                        body={rowData => (
+                            <MultiSelect 
+                                value={rowData.selectedNiveles} 
+                                options={nivelesDesempeno} 
+                                onChange={(e) => handleNivelSelect(e, rowData)} 
+                                optionLabel={n => `${n.Niv_Nivel}: ${n.Niv_Descripcion.length > 100 ? n.Niv_Descripcion.substring(0, 100) + "..." : n.Niv_Descripcion}`}
+                                style={{ width: '80%'}}
+                                display="chip"
+                                filter
+                                placeholder="Selecciona Niveles" 
+                            />
+                        )} 
+                />
+                <Column field="nivelesInfo" header="Información de Niveles" style={{ whiteSpace: 'pre-line', maxWidth: '500px' }} />
                 <Column body={(rowData) => (
                     <Button icon="pi pi-trash" className="p-button-danger" onClick={() => setTableData(tableData.filter(item => item.Ind_Id !== rowData.Ind_Id))} />
                 )} header="Quitar" />

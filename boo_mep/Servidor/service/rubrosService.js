@@ -124,8 +124,43 @@ const PostRubrosConfigurados = (req, res) => {
 };
 
 
+const GetRubrosConfigurados = (req, res) => {
+    const { periodoID, grado, materia} = req.query;
+
+    if (!periodoID || !grado || !materia) {
+        return res.status(400).send("Faltan parámetros");
+    }
+
+    const query = `
+        SELECT 
+            rc.Rub_Conf_Id,
+            re.Rub_Id,
+            re.Rub_Nombre,
+            re.Rub_Porcentaje,
+            rc.Periodo_Per_Id,
+            rc.Rub_Grado,
+            rc.Rub_Materia
+        FROM rubros_configurados rc
+        JOIN rubros_evaluacion re ON rc.Rubros_Evaluacion_Rub_Id = re.Rub_Id
+        WHERE rc.Periodo_Per_Id = ? 
+        AND rc.Rub_Grado = ? 
+        AND rc.Rub_Materia = ?;
+    `;
+
+    connection.query(query, [periodoID, grado, materia], (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send("Error al obtener rubros configurados");
+        } else {
+            return res.status(200).json(results);
+        }
+    });
+}
+
+
 app.get("/rubros", GetRubros);
 app.post("/rubros", PostRubros);
 app.post("/rubros/configurados", PostRubrosConfigurados);
+app.get("/rubros/configurados", GetRubrosConfigurados);
 
 module.exports = app;

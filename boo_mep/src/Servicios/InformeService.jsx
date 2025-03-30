@@ -43,3 +43,25 @@ export const GetInformeNotasSeccion = async (seccionID, periodoID) => {
         throw error;
     }
 }
+
+export const GetAsistenciaTotalEstudiante = async (estudianteId, seccionId, periodoID) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/informe/asistencia/total/?estudianteId=${estudianteId}&seccionId=${seccionId}&periodoID=${periodoID}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const GetAsistenciaTotalSeccion = async (seccionID, periodoID) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/informe/asistencia/total/?seccionId=${seccionID}&periodoID=${periodoID}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}

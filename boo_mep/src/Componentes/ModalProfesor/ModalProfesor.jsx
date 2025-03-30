@@ -47,6 +47,11 @@ const FormularioRegistro = () => {
         e.preventDefault();
         if (validate()) {
             try {
+                // Validar que las contraseñas coincidan
+                if (formData.password !== formData.confirmarPassword) {
+                    toast.current.show({ severity: 'error', summary: 'Error', detail: 'Las contraseñas no coinciden' });
+                    return;
+                }
                 const response = await guardarDatos(formData);
                 toast.current.show({ severity: 'success', summary: 'Éxito', detail: response });
                 setFormData({
@@ -103,6 +108,20 @@ const FormularioRegistro = () => {
                             toggleMask
                         />
                         {errors.password && <small className="p-error">{errors.password}</small>}
+                    </div>
+
+                    <div className="p-field">
+                        <label htmlFor="confirmarPassword" className='label-profesor'>Confirmar Contraseña</label>
+                        <Password
+                            id="confirmarPassword"
+                            name="confirmarPassword"
+                            value={formData.confirmarPassword}
+                            onChange={handleInputChange}
+                            className={errors.confirmarPassword ? 'p-invalid' : ''}
+                            feedback={false}
+                            toggleMask
+                        />
+                        {errors.confirmarPassword && <small className="p-error">{errors.confirmarPassword}</small>}
                     </div>
 
                     <div className="p-field">
