@@ -131,19 +131,51 @@ const EvaluacionEstudiante = () => {
 };
 
 const applyGlobalValues = () => {
-    let updatedEstudiantes = estudiantes.map(student => ({
-        ...student,
-        evaluacion: {
-            ...student.evaluacion,
-            // porcentajeObtenido: porcentajeGlobal > selectedEvaluacion.porcentaje ? selectedEvaluacion.porcentaje : porcentajeGlobal,
-            puntosObtenidos: notaGlobal > selectedEvaluacion.puntos ? selectedEvaluacion.puntos : notaGlobal,
-            notaFinal: (notaGlobal * 100) / selectedEvaluacion.puntos,
-            porcentajeObtenido: (((notaGlobal * 100) / selectedEvaluacion.puntos) * (selectedEvaluacion.porcentaje / 100))
-        }
-    }));
 
-    
+    let updatedEstudiantes = estudiantes.map(student => {
+        // Si la evaluación tiene indicadores, distribuimos la nota entre ellos
+        if (selectedEvaluacion?.indicadores?.length > 0) {
+            
+
+            let updatedIndicadores = selectedEvaluacion.indicadores.map(indicador => ({
+                id: indicador.id,
+                nota: notaGlobal
+            }));
+
+            let puntosObtenidos = updatedIndicadores.reduce((acc, ind) => acc + ind.nota, 0);
+            let notaFinal = (puntosObtenidos * 100) / selectedEvaluacion.puntos;
+            let porcentajeObtenido = (notaFinal * selectedEvaluacion.porcentaje) / 100;
+
+            return {
+                ...student,
+                indicadores: updatedIndicadores,
+                evaluacion: {
+                    ...student.evaluacion,
+                    puntosObtenidos,
+                    notaFinal,
+                    porcentajeObtenido
+                }
+            };
+        } else {
+            // Caso sin indicadores, asignamos los puntos globalmente
+            let puntosObtenidos = Math.min(notaGlobal, selectedEvaluacion.puntos);
+            let notaFinal = (puntosObtenidos * 100) / selectedEvaluacion.puntos;
+            let porcentajeObtenido = (notaFinal * selectedEvaluacion.porcentaje) / 100;
+
+            return {
+                ...student,
+                evaluacion: {
+                    ...student.evaluacion,
+                    puntosObtenidos,
+                    notaFinal,
+                    porcentajeObtenido
+                }
+            };
+        }
+    });
+
     setEstudiantes(updatedEstudiantes);
+
 };
 
   const handleSave = () => {
@@ -178,6 +210,7 @@ const applyGlobalValues = () => {
         });
         if(notaNueva.length > 0){
             
+            console.log(notaNueva);
             postEstudianteNota(notaNueva);
         }
         if(NotaActualizada.length > 0){
@@ -317,7 +350,7 @@ const applyGlobalValues = () => {
         <Column field="puntos"  body={() => selectedEvaluacion?.puntos}/>
 
         {selectedEvaluacion?.indicadores?.map((indicador) => {
-            // Buscar la nota correspondiente al indicador en la tabla intermedia
+           
             const evaluacion = estudiantes
                 .map(est => 
                     est.indicadores
@@ -326,7 +359,7 @@ const applyGlobalValues = () => {
                 )
                 .find(e => e !== null);
 
-            const nota = evaluacion ? evaluacion.nota : 0; // Usar 0 como valor por defecto si no se encuentra la nota
+            const nota = evaluacion ? evaluacion.nota : 0; 
 
             return (
                 <Column

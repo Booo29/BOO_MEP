@@ -73,7 +73,7 @@ const CrearEvaluacion = () => {
             
             Swal.fire({
                 title: 'Evaluación creada',
-                text: 'Deseas agregar indicadores y niveles de desempeño a la evaluación? Seleccione "Si" y luego la opción "Siguiente" o "No" para agregarlos después',
+                text: 'Deseas agregar indicadores y niveles de desempeño a la evaluación? Seleccione "Si" y luego la opción "Siguiente" o "No" para continuar',
                 icon: 'success',
                 showCancelButton: true,
                 confirmButtonText: 'Si',

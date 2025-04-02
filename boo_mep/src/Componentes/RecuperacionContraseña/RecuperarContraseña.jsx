@@ -2,152 +2,107 @@ import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from "jwt-decode";
+import { recuperarContrasena, cambiarContrasena } from '../../Servicios/RecuperacionContrasenaService';
+
 
 const RecuperarContraseña = () => {
-  const [email, setEmail] = useState(''); // Correo electrónico
-  const [code, setCode] = useState(''); // Código de seguridad
-  const [newPassword, setNewPassword] = useState(''); // Nueva contraseña
-  const [step, setStep] = useState(1); // Para controlar el paso en el flujo (1: correo, 2: código, 3: nueva contraseña)
-  const [loading, setLoading] = useState(false); // Estado de carga
-  const [timer, setTimer] = useState(300); // Temporizador de 5 minutos (300 segundos)
-  const [isCodeValid, setIsCodeValid] = useState(false); // Validar si el código es correcto
-  const toastRef = React.useRef(null); // Para las notificaciones
 
-  // Función para manejar el envío del código de recuperación al correo
-  const sendRecoveryCode = async () => {
-    if (!email) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor ingresa tu correo', life: 3000 });
-      return;
-    }
+    const [email, setEmail] = useState('');
+    const [token, setToken] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    setLoading(true);
-    try {
-      // Llamada a la API para enviar el código de seguridad
-      await axios.post('/api/send-recovery-code', { email });
-      toastRef.current.show({ severity: 'success', summary: 'Éxito', detail: 'Te hemos enviado un código de seguridad a tu correo', life: 3000 });
+    const [isTokenSent, setIsTokenSent] = useState(false);
+    const [codeVerification, setCodeVerification] = useState('');
+    const [isPasswordChanged, setIsPasswordChanged] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const toast = React.useRef(null);
 
-      // Cambiar al paso 2: ingreso de código
-      setStep(2);
 
-      // Iniciar el temporizador de 5 minutos
-      let countdown = 300;
-      const timerInterval = setInterval(() => {
-        if (countdown <= 0) {
-          clearInterval(timerInterval);
-          toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'El código ha expirado', life: 3000 });
-          setStep(1); // Volver al paso 1 si el código expira
-        } else {
-          setTimer(countdown);
-          countdown -= 1;
+    const handleRecuperarContrasena = async () => {
+        setLoading(true);
+        try {
+            const response = await recuperarContrasena(email);
+            console.log(response.length);
+            if (response) {
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Token enviado al correo', life: 3000 });
+                setIsTokenSent(true);
+                setToken(response.token); 
+            } else {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: response.message, life: 3000 });
+            }
+        } catch (error) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Correo no encotrado', life: 3000 });
+        } finally {
+            setLoading(false);
         }
-      }, 1000);
-    } catch (error) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un error al enviar el código', life: 3000 });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Función para verificar el código ingresado por el usuario
-  const verifyCode = async () => {
-    if (!code) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor ingresa el código', life: 3000 });
-      return;
     }
 
-    setLoading(true);
-    try {
-      // Llamada a la API para verificar el código
-      const response = await axios.post('/api/verify-recovery-code', { email, code });
-      if (response.data.isValid) {
-        setIsCodeValid(true);
-        toastRef.current.show({ severity: 'success', summary: 'Éxito', detail: 'Código validado correctamente', life: 3000 });
-        setStep(3); // Cambiar al paso 3: actualización de la contraseña
-      } else {
-        toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'El código no es válido', life: 3000 });
-      }
-    } catch (error) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un error al verificar el código', life: 3000 });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleCambiarContrasena = async () => {
 
-  // Función para actualizar la contraseña
-  const updatePassword = async () => {
-    if (!newPassword) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor ingresa una nueva contraseña', life: 3000 });
-      return;
+        setLoading(true);
+        try {
+            
+            if (newPassword !== confirmPassword) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Las contraseñas no coinciden', life: 3000 });
+                return;
+            }
+       
+            if (parseInt(codeVerification) !== jwtDecode(token).codigoVerificacion) {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: 'Código de verificación incorrecto', life: 3000 });
+                return;
+            }
+
+            const response = await cambiarContrasena(token, newPassword);
+            console.log("response", response);
+
+            if (response) {
+                toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Contraseña cambiada con éxito', life: 3000 });
+                setIsPasswordChanged(true);
+                navigate('/LoginPage'); 
+            } else {
+                toast.current.show({ severity: 'error', summary: 'Error', detail: response.message, life: 3000 });
+            }
+        } catch (error) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Error al cambiar la contraseña', life: 3000 });
+        } finally {
+            setLoading(false);
+        }
     }
 
-    setLoading(true);
-    try {
-      // Llamada a la API para actualizar la contraseña
-      await axios.post('/api/update-password', { email, newPassword });
-      toastRef.current.show({ severity: 'success', summary: 'Éxito', detail: 'Contraseña actualizada correctamente', life: 3000 });
-      setStep(1); // Volver al paso 1
-      setEmail('');
-      setCode('');
-      setNewPassword('');
-    } catch (error) {
-      toastRef.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un error al actualizar la contraseña', life: 3000 });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleLogin = () => {
+        navigate('/LoginPage');
+      };
 
-  return (
-    <div className="p-d-flex p-flex-column p-ai-center">
-      <Toast ref={toastRef} />
-      {step === 1 && (
-        <div className="p-field">
-          <label htmlFor="email">Correo electrónico</label>
-          <InputText
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="Ingresa tu correo"
-            className="p-inputtext-sm"
-          />
-          <Button label="Enviar código" icon="pi pi-paper-plane" onClick={sendRecoveryCode} loading={loading} />
+    return (
+        <div className="card flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+            <Button label="Volver" icon="pi pi-arrow-left" onClick={handleLogin} className="mb-3" style={{marginBottom: "10px"}} severity="help"/>
+            <Toast ref={toast} />
+            <div className="card flex flex-column gap-3">
+                <h2>En esta pantalla podrás cambiar la contraseña</h2>
+                {!isTokenSent ? (
+                    <div className="field">
+                        <label htmlFor="email">Correo</label>
+                        <InputText id="email" value={email} onChange={(e) => setEmail(e.target.value)} type="text" placeholder="Ingrese el correo electronico usado en el sistema" />
+                        <Button label="Enviar Token" icon="pi pi-check" onClick={handleRecuperarContrasena} loading={loading} className="mt-2" />
+                    </div>
+                ) : (
+                    <div className="field">
+                        <label htmlFor="token">Código de Verificación</label>
+                        <InputText id="token" value={codeVerification} onChange={(e) => setCodeVerification(e.target.value)} type="text" placeholder="Ingrese el código de verificación" />
+                        <label htmlFor="newPassword">Nueva Contraseña</label>
+                        <InputText id="newPassword" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} type="password" placeholder="Ingrese la nueva contraseña" />
+                        <label htmlFor="confirmPassword">Confirmar Nueva Contraseña</label>
+                        <InputText id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" placeholder="Confirme la nueva contraseña" />
+                        <Button label="Cambiar Contraseña" icon="pi pi-check" onClick={handleCambiarContrasena} loading={loading} className="mt-2" />
+                    </div>
+                )}
+            </div>
         </div>
-      )}
-
-      {step === 2 && (
-        <div className="p-field">
-          <label htmlFor="code">Código de seguridad</label>
-          <InputText
-            id="code"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            placeholder="Ingresa el código enviado a tu correo"
-            className="p-inputtext-sm"
-          />
-          <div>
-            <span>{`Tiempo restante: ${Math.floor(timer / 60)}:${timer % 60}`}</span>
-          </div>
-          <Button label="Verificar código" icon="pi pi-check" onClick={verifyCode} loading={loading} />
-        </div>
-      )}
-
-      {step === 3 && isCodeValid && (
-        <div className="p-field">
-          <label htmlFor="newPassword">Nueva contraseña</label>
-          <InputText
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            type="password"
-            placeholder="Ingresa tu nueva contraseña"
-            className="p-inputtext-sm"
-          />
-          <Button label="Actualizar contraseña" icon="pi pi-refresh" onClick={updatePassword} loading={loading} />
-        </div>
-      )}
-    </div>
-  );
-};
+    );
+}
 
 export default RecuperarContraseña;

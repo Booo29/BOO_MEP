@@ -111,7 +111,12 @@ const CrearIndicadoresyNiveles = () => {
           position: 'top-end',
           timer: 1500
         });
-        navigate('/EvaluacionesPage');
+        //Limpiar el formulario para elementar nuevos indicadores y niveles
+        setTableData([]);
+        setSelectedIndicadores([]);
+        
+        
+        //navigate('/EvaluacionesPage');
         
     };
 
@@ -166,7 +171,7 @@ const CrearIndicadoresyNiveles = () => {
                 <InputText type="number" value={nuevoNivel.puntos} onChange={(e) => setNuevoNivel({ ...nuevoNivel, puntos: e.target.value })} placeholder="Puntos" />
                 <Button label="Guardar" onClick={handleCreateNivel} />
             </Dialog>
-            <Button label="Guardar Todo" style={{ marginTop: '20px' }} onClick={handleSave} />
+            <Button label="Guardar Indicador" style={{ marginTop: '20px' }} onClick={handleSave} />
         </div>
     );
 };

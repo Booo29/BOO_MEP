@@ -17,6 +17,7 @@ import {GetInformeAsistenciaSeccion, GetInformeAsistenciaEstudiante, GetInformeN
 import useCicloStore from "../../store/CicloStore";
 import useStore from "../../store/store";
 import usePeriodoStore from "../../store/PeriodoStore";
+import { a } from 'framer-motion/client';
 
 const InformeAsistencia = () => {
 
@@ -109,42 +110,52 @@ const InformeAsistencia = () => {
     if(selectedReportType === 'InformeAsistenciaGrupal'){
       const informe = await GetInformeAsistenciaSeccion(selectedSeccion, startDate.toISOString().split("T")[0], endDate.toISOString().split("T")[0]);
 
+      const totalAsistencia = await GetAsistenciaTotalSeccion(selectedSeccion, periodoId);
+
+      const asistenciaPorEstudiante = new Map();
+      totalAsistencia.forEach(dato => {
+          const totalClases = dato.Total_Presente + dato.Total_Ausente + dato.Total_Ausente_Justificado;
+          const porcentajeAusencias = totalClases > 0 ? Math.round((dato.Total_Ausente / totalClases) * 100 ): 0;
+          const porcentajeAsistencia = tablaMEP.find(rango => porcentajeAusencias >= rango.min && porcentajeAusencias < rango.max)?.asistencia || 0;
+          asistenciaPorEstudiante.set(dato.Est_Identificacion, { porcentajeAsistencia, porcentajeAusencias });
+      });
+
       const datosInforme = {
-        fechaHoy : new Date().toISOString().split("T")[0],
-        seccion: secciones.find((seccion) => seccion.value === selectedSeccion).label,
+        fechaHoy: new Date().toISOString().split("T")[0],
+        seccion: secciones.find(seccion => seccion.value === selectedSeccion).label,
         institucion: institucion.Inst_Nombre,
         profesor: `${jwtDecode(cookies.get("token")).profesor}`,
+        datos: informe.map(dato => {
+            const asistencia = asistenciaPorEstudiante.get(dato.Est_Identificacion) || { porcentajeAsistencia: 0, porcentajeAusencias: 0 };
+            return {
+                identificacion: dato.Est_Identificacion,
+                nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
+                materia: dato.Mat_Nombre,
+                total_presente: dato.Total_Presente,
+                fechas_presente: dato.Fechas_Presente,
+                total_ausente: dato.Total_Ausente,
+                fechas_ausente: dato.Fechas_Ausente,
+                total_tardia: dato.Total_Tarde,
+                fechas_tardia: dato.Fechas_Tarde,
+                total_justificada: dato.Total_Ausente_Justificado,
+                fechas_justificada: dato.Fechas_Ausente_Justificado,
+                porcentaje_asistencia: asistencia.porcentajeAsistencia,
+                porcentaje_ausencia: asistencia.porcentajeAusencias,
+            };
+        }),
       };
-
-      datosInforme.datos = informe.map( (dato) => { 
-
-        const totalClases = dato.Total_Presente + dato.Total_Ausente + dato.Total_Ausente_Justificado;
-
-        const porcentajeAusencias = totalClases > 0 ? (dato.Total_Ausente / totalClases) * 100 : 0;
-        
-        const porcentajeAsistenciaFinal = tablaMEP.find(rango => porcentajeAusencias >= rango.min && porcentajeAusencias < rango.max)?.asistencia || 0;
-      
-        return {
-        identificacion: dato.Est_Identificacion,
-        nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
-        materia: dato.Mat_Nombre,
-        total_presente: dato.Total_Presente,
-        fechas_presente: dato.Fechas_Presente,
-        total_ausente: dato.Total_Ausente,
-        fechas_ausente: dato.Fechas_Ausente,
-        total_tardia: dato.Total_Tarde,
-        fechas_tardia: dato.Fechas_Tarde,
-        total_justificada: dato.Total_Ausente_Justificado,
-        fechas_justificada: dato.Fechas_Ausente_Justificado ,
-        porcentaje_asistencia: porcentajeAsistenciaFinal,
-        porcentaje_ausencia: porcentajeAusencias,
-      }
-      });
 
       GenerarDocumento('REPORTEASISTENCIAGRUPAL.docx', datosInforme, `Reporte de asistencia grupal - ${secciones.find((seccion) => seccion.value === selectedSeccion).label}`);
     }
     if(selectedReportType === 'InformeAsistenciaIndividual'){
       const informe = await GetInformeAsistenciaEstudiante(selectedSeccion, selectedEstudiante, startDate.toISOString().split("T")[0], endDate.toISOString().split("T")[0]);
+      
+      const totalAsistencia = await GetAsistenciaTotalEstudiante(selectedEstudiante, selectedSeccion, periodoId);
+
+      const totalClases = totalAsistencia[0].Total_Presente + totalAsistencia[0].Total_Ausente + totalAsistencia[0].Total_Ausente_Justificado;
+      const porcentajeAusencias = totalClases > 0 ? Math.round((totalAsistencia[0].Total_Ausente / totalClases) * 100) : 0;
+      const porcentajeAsistencia = tablaMEP.find(rango => porcentajeAusencias >= rango.min && porcentajeAusencias < rango.max)?.asistencia || 0;
+      
       const datosInforme = {
         fechaHoy : new Date().toISOString().split("T")[0],
         nombre: `${informe[0].Est_Nombre} ${informe[0].Est_PrimerApellido} ${informe[0].Est_SegundoApellido}`,
@@ -154,11 +165,7 @@ const InformeAsistencia = () => {
       };
 
       datosInforme.datos = informe.map((dato) => {
-        const totalClases = dato.Total_Presente + dato.Total_Ausente + dato.Total_Ausente_Justificado;
 
-        const porcentajeAusencias = totalClases > 0 ? (dato.Total_Ausente / totalClases) * 100 : 0;
-        
-        const porcentajeAsistenciaFinal = tablaMEP.find(rango => porcentajeAusencias >= rango.min && porcentajeAusencias < rango.max)?.asistencia || 0;
 
         return {
           identificacion: dato.Est_Identificacion,
@@ -172,7 +179,7 @@ const InformeAsistencia = () => {
           fechas_tardia: dato.Fechas_Tarde,
           total_justificada: dato.Total_Ausente_Justificado,
           fechas_justificada: dato.Fechas_Ausente_Justificado ,
-          porcentaje_asistencia: porcentajeAsistenciaFinal,
+          porcentaje_asistencia: porcentajeAsistencia,
           porcentaje_ausencia: porcentajeAusencias,
         }
 

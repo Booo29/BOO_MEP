@@ -27,6 +27,7 @@ app.use(require('./service/NotasService.js'));
 app.use(require('./service/InformesService.js'));
 app.use(require('./service/CronicasService.js'));
 app.use(require('./service/edicionSeccionService.js'));
+app.use(require('./service/recuperacionContrasenaService.js'));
 
 app.listen(3000, () => {
     console.log("El servidor está inicializado en el puerto 3000");
