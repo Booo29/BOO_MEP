@@ -6,19 +6,44 @@ import { useNavigate } from 'react-router-dom';
 
 const tutorials = [
   {
-    title: "¿Cómo Crear una Evaluación?",
-    description: "Aprende como crear evaluaciones.",
-    url: "https://youtu.be/VJ-EW2AhWfg",
+    title: "¿Cómo descargar e instalar la aplicación de EduPlan?",
+    description: "Aprende como descargar e instalar la aplicación de EduPlan.",
+    url: "https://youtu.be/yFUvDjwgo58",
   },
   {
-    title: "¿Cómo Evaluar a tus Estudiantes?",
-    description: "Aprende como evaluar a tus estudiantes.",
-    url: "https://youtu.be/5hyfQdYG1BA",
+    title: "¿Cómo crear un usuario?",
+    description: "Aprende como crear un usuario.",
+    url: "https://youtu.be/fUflqZeDK5g",
   },
   {
-    title: "¿Como Crear un Informe",
+    title: "¿Cómo crear una institución?",
+    description: "Aprende como crear una institución.",
+    url: "https://youtu.be/g9ENuh1hLHY",
+  },
+  {
+    title: "¿Cómo crear un ciclo lectivo?",
+    description: "Aprende como crear un ciclo lectivo.",
+    url: "https://youtu.be/H5v5AetwSH4",
+  },
+  {
+    title: "¿Cómo pasar lista de asistencia?",
+    description: "Aprende como pasar la lista de asistencia.",
+    url: "https://youtu.be/YfxJXbkKad4",
+  },
+  {
+    title: "¿Cómo crear una evaluación?",
+    description: "Aprende como crear evaluaciones y asignarle notas a tus estudiantes.",
+    url: "https://youtu.be/oRNSVai9XXE",
+  },
+  {
+    title: "¿Como crear un informe",
     description: "Aprende como crear un informe.",
-    url: "https://youtu.be/IdIlT1SWxvU",
+    url: "https://youtu.be/UbVWa-xvpSg",
+  },
+  {
+    title: "¿Como recuperar mi contraseña?",
+    description: "Aprende ha como recuperar mi contraseña.",
+    url: "https://youtu.be/S9o3-OF8S50",
   },
 ];
 
