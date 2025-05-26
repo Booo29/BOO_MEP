@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { addLocale } from 'primereact/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
-import {PostEvaluaciones} from '../../Servicios/EvaluacionService';
+import {PostEvaluaciones, GetEvaluacionIndicadoresNivelesById, PutEvaluacion} from '../../Servicios/EvaluacionService';
 
 import useMateriaStore from '../../store/MateriaStore';
 import useGradoStore from '../../store/GradoStore';
@@ -18,6 +18,7 @@ const CrearEvaluacion = () => {
     const nombreMateria = useMateriaStore((state) => state.materiaNombre);
     const nombreGrado = useGradoStore((state) => state.gradoNombre);
     const periodoId = usePeriodoStore((state) => state.periodoId);
+    const evaluacionId = useEvaluacionStore((state) => state.evaluacionId);
 
     const setEvaluacionId = useEvaluacionStore((state) => state.setEvaluacionId);
 
@@ -29,6 +30,30 @@ const CrearEvaluacion = () => {
         indicadores: [],
         nivelesDesempeno: []
     });
+
+    useEffect(() => {
+        const fetchEvaluacion = async () => {
+            if (evaluacionId) {
+                try {
+                    const response = await GetEvaluacionIndicadoresNivelesById(evaluacionId);
+                    setEvaluacion({
+                        ...evaluacion,
+                        nombre: response[0].nombre,
+                        puntos: response[0].puntos,
+                        porcentaje: response[0].porcentaje,
+                        fecha: new Date(response[0].fecha),
+                        indicadores: response[0].indicadores,
+                        nivelesDesempeno: response[0].NivelesDesempeno
+                    });
+                } catch (error) {
+                    console.error('Error fetching evaluacion:', error);
+                }
+            }
+        };
+        fetchEvaluacion();
+    }
+    , [evaluacionId]);
+
 
     addLocale('es', {
             firstDayOfWeek: 1,
@@ -58,42 +83,101 @@ const CrearEvaluacion = () => {
 
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const nuevaEvaluacion = {
-                Eva_Materia: nombreMateria,
-                Eva_Grado: nombreGrado,
-                Eva_Nombre: evaluacion.nombre,
-                Eva_Fecha: evaluacion.fecha.toISOString().split("T")[0],
-                Eva_Porcentaje: evaluacion.porcentaje,
-                Eva_Puntos: evaluacion.puntos,
-                Periodo_idPeriodo: periodoId
-            };
-            const response = await PostEvaluaciones(nuevaEvaluacion);
-            
-            Swal.fire({
-                title: 'Evaluación creada',
-                text: 'Deseas agregar indicadores y niveles de desempeño a la evaluación? Seleccione "Si" y luego la opción "Siguiente" o "No" para continuar',
-                icon: 'success',
-                showCancelButton: true,
-                confirmButtonText: 'Si',
-                cancelButtonText: 'No'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    setEvaluacionId(response.insertedIds[0]);
-                } else {
-                    navigate('/EvaluacionesPage');
-                }
-            });
-        } catch (error) {
-            Swal.fire({
-                title: 'Error',
-                text: 'Ha ocurrido un error al crear la evaluación',
-                icon: 'error',
-                confirmButtonText: 'Aceptar'
-            });
+        if (evaluacionId) {
+            e.preventDefault();
+            try {
+                const updatedEvaluacion = {
+                    Eva_Materia: nombreMateria,
+                    Eva_Grado: nombreGrado,
+                    Eva_Nombre: evaluacion.nombre,
+                    Eva_Fecha: evaluacion.fecha.toISOString().split("T")[0],
+                    Eva_Porcentaje: evaluacion.porcentaje,
+                    Eva_Puntos: evaluacion.puntos,
+                    Periodo_idPeriodo: periodoId
+                };
+                await PutEvaluacion(evaluacionId, updatedEvaluacion);
+                
+                Swal.fire({
+                    title: 'Evaluación actualizada',
+                    text: 'Deseas agregar indicadores y niveles de desempeño a la evaluación? Seleccione "Si" y luego la opción "Siguiente" o "No" para continuar',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Si',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        setEvaluacionId(evaluacionId);
+                    } else {
+                        navigate('/EvaluacionesPage');
+                        //Limpiar los campos
+                        setEvaluacion({
+                            nombre: '',
+                            puntos: '',
+                            porcentaje: '',
+                            fecha: null,
+                            indicadores: [],
+                            nivelesDesempeno: []
+                        });
+                    }
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ha ocurrido un error al actualizar la evaluación',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+            return;
+        } else{
+            e.preventDefault();
+            try {
+                const nuevaEvaluacion = {
+                    Eva_Materia: nombreMateria,
+                    Eva_Grado: nombreGrado,
+                    Eva_Nombre: evaluacion.nombre,
+                    Eva_Fecha: evaluacion.fecha.toISOString().split("T")[0],
+                    Eva_Porcentaje: evaluacion.porcentaje,
+                    Eva_Puntos: evaluacion.puntos,
+                    Periodo_idPeriodo: periodoId
+                };
+                const response = await PostEvaluaciones(nuevaEvaluacion);
+                
+                Swal.fire({
+                    title: 'Evaluación creada',
+                    text: 'Deseas agregar indicadores y niveles de desempeño a la evaluación? Seleccione "Si" y luego la opción "Siguiente" o "No" para continuar',
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: 'Si',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        setEvaluacionId(response.insertedIds[0]);
+                    } else {
+                        navigate('/EvaluacionesPage');
+                        //Limpiar los campos
+                        setEvaluacion({
+                            nombre: '',
+                            puntos: '',
+                            porcentaje: '',
+                            fecha: null,
+                            indicadores: [],
+                            nivelesDesempeno: []
+                        });
+                    }
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Ha ocurrido un error al crear la evaluación',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         }
+        
     };
+
 
     return (
         <div className="p-grid p-fluid">

@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { Password } from 'primereact/password';
 import { InputText } from 'primereact/inputtext';    
 import { Button } from 'primereact/button'; 
-import { style } from 'framer-motion/client';
+
 
 const Login = () => {
 

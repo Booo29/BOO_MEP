@@ -35,8 +35,13 @@ const EvaluacionesStepForm = () => {
     { label: 'Indicadores y Niveles de desempeño' },
   ];
 
+  const handleMenu = () => {
+    navigate('/EvaluacionesPage');
+  }
+
   return (
-    <div>
+    <div style={{ padding: "16px" }}>
+      <Button label="Regresar" severity="help" onClick={handleMenu} />
       <Steps model={steps} activeIndex={activeStep} style={{marginTop: '40px'}} />
       <div className="step-content" style={{ marginTop: '20px', minHeight: '150px', padding: '20px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: '#f9f9f9', boxShadow: '0 2px 4px 0 rgba(0,0,0,0.1)', marginBottom: '20px' }}>
         {activeStep === 0 && <CrearEvaluacion/>}

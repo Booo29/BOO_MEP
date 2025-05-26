@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 
-//nos ayuda a analizar el cuerpo de la solicitud POST
 app.use(express.json());
 
 app.use(express.urlencoded({extended: true}));
@@ -28,6 +28,9 @@ app.use(require('./service/InformesService.js'));
 app.use(require('./service/CronicasService.js'));
 app.use(require('./service/edicionSeccionService.js'));
 app.use(require('./service/recuperacionContrasenaService.js'));
+app.use(require('./service/respaldoService.js'));
+
+app.use("/backup", express.static(path.join(__dirname, "backup")));
 
 app.listen(3000, () => {
     console.log("El servidor está inicializado en el puerto 3000");

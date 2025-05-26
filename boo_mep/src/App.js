@@ -17,6 +17,7 @@ import TutorialesPage from "./Paginas/TutorialesPage";
 import CronicasPage from "./Paginas/CronicasPage";
 import EliminarCicloPage from "./Paginas/EliminarCicloPage";
 import EditarSeccionesPage from "./Paginas/EditarSeccionesPage";
+import RespaldoPage from "./Paginas/RespaldoPage";
 
 export function App() {
   return (
@@ -40,7 +41,8 @@ export function App() {
           <Route path="/CronicasPage" element={<CronicasPage />} />
           <Route path="/EliminarCicloPage" element={<EliminarCicloPage />} />
           <Route path="/EditarSeccionesPage" element={<EditarSeccionesPage />} />
-          
+          <Route path="/RespaldoPage" element={<RespaldoPage />} />
+
 
           <Route path="*" element={<Navigate to="/" replace />} />
 

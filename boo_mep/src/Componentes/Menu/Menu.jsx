@@ -12,7 +12,7 @@ import Tutoriales from "../../Recursos/icono_tutorial.png";
 import Cronicas from "../../Recursos/icono_cronica.png";
 import Eliminar from "../../Recursos/icono_eliminar.png";
 import EditarSecciones from "../../Recursos/icono_EditarSecciones.png";
-
+import CrearRespaldo from "../../Recursos/icono_Respaldo.png";
 
 const Menu = () => {
     const navigate = useNavigate();
@@ -69,12 +69,19 @@ const Menu = () => {
             color: "#E262E8",
             onClick: () => navigate("/TutorialesPage"),
         },
+                {
+            nombre: "Crear Respaldo",
+            imagen: CrearRespaldo,           
+            color: "#2bca97",
+            onClick: () => navigate("/RespaldoPage"),
+        },
         {
             nombre: "Eliminar Ciclo",
             imagen: Eliminar,           
             color: "#e8364f",
             onClick: () => navigate("/EliminarCicloPage"),
-        }
+        },
+
 
     ];
 

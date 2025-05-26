@@ -15,6 +15,7 @@ import useStore from "../../store/store";
 import usePeriodoStore from '../../store/PeriodoStore';
 import useMateriaStore from '../../store/MateriaStore';
 import useGradoStore from '../../store/GradoStore';
+import useEvaluacionStore from '../../store/EvaluacionStore';
 
 const EvaluacionesPrincipal = () => {
 
@@ -23,6 +24,7 @@ const EvaluacionesPrincipal = () => {
     const cicloId = useCicloStore((state) => state.cicloId);
     const institutionId = useStore((state) => state.institutionId);
     const periodoId = usePeriodoStore((state) => state.periodoId);
+    const setEvaluacionId = useEvaluacionStore((state) => state.setEvaluacionId);
 
     const setMateriaNombre = useMateriaStore((state) => state.setMateriaNombre);
     const setGradoNombre = useGradoStore((state) => state.setGradoNombre);
@@ -33,7 +35,7 @@ const EvaluacionesPrincipal = () => {
     const [selectedMateria, setSelectedMateria] = useState(null);
     const [evaluaciones, setEvaluaciones] = useState([]);
 
-    const [expandedRows, setExpandedRows] = useState(null); // Estado para manejar las filas expandidas
+    const [expandedRows, setExpandedRows] = useState(null); 
 
 
     useEffect(() => {
@@ -90,6 +92,11 @@ const EvaluacionesPrincipal = () => {
         setGradoNombre(selectedGrado.nombre);
     }
 
+    const handleEdit = (id) => {
+        setEvaluacionId(id);
+        navigate('/EvaluacionesStepFormPage');
+    }
+
     const handleDelete = (id) => {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -126,7 +133,7 @@ const EvaluacionesPrincipal = () => {
         navigate('/MenuPage');
       }
 
-          // Función para mostrar la tabla de indicadores cuando se expande la fila
+
     const rowExpansionTemplate = (rowData) => {
         return (
             <div style={{ padding: "16px" }}>
@@ -158,7 +165,7 @@ const EvaluacionesPrincipal = () => {
                 Crear Evaluación
             </h1>
     
-            {/* Contenedor para los dropdowns en una misma fila */}
+        
             <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
                 <div style={{ flex: 1 }}>
                     <label htmlFor="grado" style={{fontWeight: "bold"}}>Grado</label>
@@ -210,7 +217,7 @@ const EvaluacionesPrincipal = () => {
 
                 <Column body={(rowData) => (
                     <div style={{ display: "flex", gap: "8px" }}>
-                        {/* <Button icon="pi pi-pencil" className="p-button-warning" onClick={() => {}} /> */}
+                        <Button icon="pi pi-pencil" className="p-button-success" onClick={() => handleEdit(rowData.id)} />
                         <Button icon="pi pi-trash" className="p-button-danger" onClick={() => handleDelete(rowData.id)} />
                     </div>
                 )} />

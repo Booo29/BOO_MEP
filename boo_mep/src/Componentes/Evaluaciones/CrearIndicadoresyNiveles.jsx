@@ -7,7 +7,6 @@ import { InputText } from "primereact/inputtext";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
 import useEvaluacionStore from '../../store/EvaluacionStore';
 
 import {
@@ -15,12 +14,11 @@ import {
     GetNivelesDesempeno,
     PostIndicadores,
     PostNivelesDesempeno,
-    PostIndicadoresEvaluacionNiveles
+    PostIndicadoresEvaluacionNiveles,
+    GetEvaluacionIndicadoresNivelesById
 } from '../../Servicios/EvaluacionService';
 
 const CrearIndicadoresyNiveles = () => {
-
-    const navigate = useNavigate();
     
     const evaluacionId = useEvaluacionStore((state) => state.evaluacionId);
 
@@ -32,22 +30,67 @@ const CrearIndicadoresyNiveles = () => {
     const [visibleNivel, setVisibleNivel] = useState(false);
     const [nuevoIndicador, setNuevoIndicador] = useState('');
     const [nuevoNivel, setNuevoNivel] = useState({ nivel: '', puntos: '', descripcion: '' });
-
+    const [isEditMode, setIsEditMode] = useState(false);
 
     useEffect(() => {
         GetIndicadores().then(setIndicadores);
         GetNivelesDesempeno().then(setNivelesDesempeno);
+        if (evaluacionId) {
+            GetEvaluacionIndicadoresNivelesById(evaluacionId).then((response) => {
+                if (response && Array.isArray(response[0].indicadores)) {
+                    const updatedTableData = response[0].indicadores.map(indicador => ({
+                        Ind_Id: indicador.id,
+                        Ind_Nombre: indicador.nombre,
+                        selectedNiveles: indicador.niveles.map(nivel => ({
+                            Niv_Id: nivel.id,
+                            Niv_Nivel: nivel.nivel,
+                            Niv_Descripcion: nivel.descripcion
+                        })),
+                        nivelesInfo: indicador.niveles.map(nivel => 
+                            `${nivel.nivel}: ${nivel.descripcion}`
+                        ).join('\n'),
+                        isExisting: true
+                    }));
+                    setSelectedIndicadores(response[0].indicadores.map(ind => ({
+                        Ind_Id: ind.id,
+                        Ind_Nombre: ind.nombre
+                    })));
+    
+                    setTableData(updatedTableData);
+                    setIsEditMode(true);
+                } else {
+                    console.error('No vienen indicadores en el response:', response);
+                }
+            });
+        }
+
     }, []);
 
     const handleIndicadorSelect = (e) => {
-        setSelectedIndicadores(e.value);
-        const updatedTableData = e.value.map(indicador => ({
+
+        const nuevosIndicadores = e.value.filter(newItem =>
+            !tableData.some(existing => existing.Ind_Id === newItem.Ind_Id)
+        );
+
+        const newTableData = nuevosIndicadores.map(indicador => ({
             Ind_Id: indicador.Ind_Id,
             Ind_Nombre: indicador.Ind_Nombre,
             selectedNiveles: [],
-            nivelesInfo: ''
+            nivelesInfo: '',
+            isNew: true // Marca como nuevo para diferenciarlos
         }));
-        setTableData(updatedTableData);
+
+        setTableData(prev => [...prev, ...newTableData]);
+        setSelectedIndicadores(e.value);
+
+        // setSelectedIndicadores(e.value);
+        // const updatedTableData = e.value.map(indicador => ({
+        //     Ind_Id: indicador.Ind_Id,
+        //     Ind_Nombre: indicador.Ind_Nombre,
+        //     selectedNiveles: [],
+        //     nivelesInfo: ''
+        // }));
+        // setTableData(updatedTableData);
     };
 
     const handleNivelSelect = (e, rowData) => {
@@ -98,25 +141,47 @@ const CrearIndicadoresyNiveles = () => {
     };
 
     const handleSave = () => {
-        const payload = tableData.map(row => ({
+
+        const dataToSend = isEditMode 
+        ? tableData.filter(row => row.isNew) // Solo nuevos en modo edición
+        : tableData;
+
+        const payload = dataToSend.map(row => ({
             Evaluaciones_Eva_Id: evaluacionId, 
             Indicadores_Ind_Id: row.Ind_Id,
             Indicadores_Desempeno: row.selectedNiveles.map(nivel => ({ Niveles_desempeno_Niv_Id: nivel.Niv_Id }))
         }));
-        PostIndicadoresEvaluacionNiveles(payload);
-        Swal.fire({
-          icon: 'success',
-          title: 'Indicadores y niveles de desempeño creados correctamente',
-          showConfirmButton: false,
-          position: 'top-end',
-          timer: 1500
+
+        if (payload.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'No hay cambios para guardar',
+                showConfirmButton: false,
+                position: 'top-end',
+                timer: 1500
+            });
+            return;
+        }
+
+        PostIndicadoresEvaluacionNiveles(payload).then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Indicadores y niveles de desempeño guardados correctamente',
+                showConfirmButton: false,
+                position: 'top-end',
+                timer: 1500
+            });
+
+            // Reset states solo si no estás en edición
+            if (!isEditMode) {
+                setTableData([]);
+                setSelectedIndicadores([]);
+            } else {
+                // Si estás en edición, marca como no nuevo después de guardar
+                const updatedTable = tableData.map(row => ({ ...row, isNew: false }));
+                setTableData(updatedTable);
+            }
         });
-        //Limpiar el formulario para elementar nuevos indicadores y niveles
-        setTableData([]);
-        setSelectedIndicadores([]);
-        
-        
-        //navigate('/EvaluacionesPage');
         
     };
 
@@ -133,6 +198,7 @@ const CrearIndicadoresyNiveles = () => {
                     style={{ width: '50%' }}
                     display="chip" 
                     filter 
+                    
                 />
                 <Button label="Crear Indicador" onClick={() => setVisibleIndicador(true)} />
                 <Button label="Crear Nivel de Desempeño" onClick={() => setVisibleNivel(true)} />
@@ -153,13 +219,18 @@ const CrearIndicadoresyNiveles = () => {
                                 display="chip"
                                 filter
                                 placeholder="Selecciona Niveles" 
+                                disabled={rowData.isExisting}
                             />
                         )} 
                 />
                 <Column field="nivelesInfo" header="Información de Niveles" style={{ whiteSpace: 'pre-line', maxWidth: '500px' }} />
+               
                 <Column body={(rowData) => (
-                    <Button icon="pi pi-trash" className="p-button-danger" onClick={() => setTableData(tableData.filter(item => item.Ind_Id !== rowData.Ind_Id))} />
+                    !rowData.isExisting ? (
+                        <Button icon="pi pi-trash" className="p-button-danger" onClick={() => setTableData(tableData.filter(item => item.Ind_Id !== rowData.Ind_Id))} />
+                    ) : null
                 )} header="Quitar" />
+
             </DataTable>
             <Dialog header="Crear Indicador" visible={visibleIndicador} onHide={() => setVisibleIndicador(false)}>
                 <InputTextarea value={nuevoIndicador} onChange={(e) => setNuevoIndicador(e.target.value)} rows={3} cols={30} placeholder="Nombre del Indicador" />

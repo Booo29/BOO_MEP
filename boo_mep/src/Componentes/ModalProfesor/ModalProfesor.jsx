@@ -3,7 +3,8 @@ import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
 import { Button } from 'primereact/button';
-import { guardarDatos } from '../../Servicios/RegistrarProfesorService'; // Importa el servicio que creaste
+import { guardarDatos } from '../../Servicios/RegistrarProfesorService'; 
+import { restaurarRespaldo } from '../../Servicios/RespaldoService';
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +20,9 @@ const FormularioRegistro = () => {
         segundoApellido: '',
         correo: '',
     });
+
+    const [file, setFile] = useState(null);
+    const [status, setStatus] = useState("");
 
     const navigate = useNavigate();
 
@@ -72,6 +76,29 @@ const FormularioRegistro = () => {
             } catch (error) {
                 toast.current.show({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el registro' });
             }
+        }
+    };
+
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
+    const handleUpload = async () => {
+        if (!file) {
+            toast.current.show({ severity: 'error', summary: 'Error', detail: 'Por favor selecciona un archivo' });
+            return;
+        }
+
+        setStatus("Subiendo y restaurando respaldo...");
+        try {
+            const result = await restaurarRespaldo(file);
+            setStatus(result.message || "Respaldo restaurado exitosamente");
+            toast.current.show({ severity: 'success', summary: 'Éxito', detail: result.message || "Respaldo restaurado exitosamente" });
+            setTimeout(() => {
+                    navigate('/login');
+            }, 2000);
+        } catch (error) {
+            setStatus("Error al restaurar el respaldo");
         }
     };
 
@@ -183,7 +210,14 @@ const FormularioRegistro = () => {
                     </div>
 
                     <Button label="Registrar" className="p-mt-3 custom-button" type='submit' />
+                    
                 </form>
+            </Card>
+            <Card className="p-shadow-5 card-custom" style={{ marginTop: '20px' }}>
+                <h2 className="titulo-secundario">Restaurar Respaldo</h2>
+                <input type="file" onChange={handleFileChange} />
+                <Button label="Subir Respaldo" className="p-mt-3 custom-button " onClick={handleUpload} style={{backgroundColor: "blue"}}/>
+                {status && <p>{status}</p>}
             </Card>
         </div>
     </div>

@@ -77,10 +77,44 @@ export const PostIndicadoresEvaluacionNiveles = async (data) => {
     }
 }
 
+export const PutIndicadoresEvaluacionNiveles = async (id, data) => {
+    try {
+        console.log("Updating Indicadores Evaluacion Niveles with ID:", id);
+        const response = await axios.put(`http://localhost:3000/indicadoresEvaluacionNiveles/${id}`, data);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
 
 export const DeleteEvaluacion = async (id) => {
     try {
         const response = await axios.delete(`http://localhost:3000/evaluaciones/${id}`);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const PutEvaluacion = async (id, data) => {
+    try {
+        const response = await axios.put(`http://localhost:3000/evaluaciones/${id}`, data);
+        return response.data;
+
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
+
+export const GetEvaluacionIndicadoresNivelesById = async (id) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/evaluaciones/${id}`);
         return response.data;
 
     } catch (error) {
