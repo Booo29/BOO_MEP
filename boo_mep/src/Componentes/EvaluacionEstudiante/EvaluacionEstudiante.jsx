@@ -18,6 +18,7 @@ import useCicloStore from "../../store/CicloStore";
 import useStore from "../../store/store";
 import usePeriodoStore from '../../store/PeriodoStore';
 
+
 const EvaluacionEstudiante = () => {
 
   const navigate = useNavigate();
@@ -63,6 +64,8 @@ const EvaluacionEstudiante = () => {
       GetMateriasByGradoSeccion(selectedSeccion.Id_Grado_Seccion).then(
         setMaterias
       );
+      setSelectedMateria(null);
+      setSelectedEvaluacion(null);
     }
   }, [selectedSeccion]);
 
@@ -178,7 +181,20 @@ const applyGlobalValues = () => {
 
 };
 
-  const handleSave = () => {
+const cleanData = () => {
+    setSelectedSeccion(null);
+    setSelectedMateria(null);
+    setSelectedEvaluacion(null);
+    setEstudiantes([]);
+    setNotaGlobal("");
+    setPorcentajeGlobal("");
+    setMaterias([]);
+    setEvaluaciones([]);
+}
+
+
+
+const handleSave = () => {
     try{
         const notaNueva = [];
         const NotaActualizada = [];
@@ -209,8 +225,7 @@ const applyGlobalValues = () => {
             }
         });
         if(notaNueva.length > 0){
-            
-            console.log(notaNueva);
+        
             postEstudianteNota(notaNueva);
         }
         if(NotaActualizada.length > 0){
@@ -223,6 +238,8 @@ const applyGlobalValues = () => {
             timer: 1500,
             showConfirmButton: false,
         });
+
+        cleanData();
     }
     catch(error){
         console.error(error);

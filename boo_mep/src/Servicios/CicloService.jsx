@@ -43,3 +43,4 @@ export const deleteCiclo = async (idCiclo) => {
         throw error;
     }
 }
+

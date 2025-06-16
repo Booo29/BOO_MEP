@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import {GenerarDocumento} from './GenerarDocumento';
 
+import {getPeriodo} from '../../Servicios/PeriodoService';
 import {getGradoSecciones} from '../../Servicios/GradoSeccionService';
 import {getEstudiantes} from '../../Servicios/EstudiantesService';
 import {getInstitucionbyId} from '../../Servicios/InstitucionService';
@@ -17,7 +18,6 @@ import {GetInformeAsistenciaSeccion, GetInformeAsistenciaEstudiante, GetInformeN
 import useCicloStore from "../../store/CicloStore";
 import useStore from "../../store/store";
 import usePeriodoStore from "../../store/PeriodoStore";
-import { a } from 'framer-motion/client';
 
 const InformeAsistencia = () => {
 
@@ -44,6 +44,7 @@ const InformeAsistencia = () => {
   const periodoId = usePeriodoStore((state) => state.periodoId);
 
   const [institucion, setInstitucion] = useState(null);
+  const [periodo, setPeriodo] = useState(null);
   const [selectedReportType, setSelectedReportType] = useState(null);
   const [secciones, setSecciones] = useState([]);
   const [estudiantes, setEstudiantes] = useState([]);
@@ -76,6 +77,8 @@ const InformeAsistencia = () => {
               value: seccion.Id_Grado_Seccion,
             }))
           );
+          const periodoInicial = await getPeriodo(periodoId);
+          setPeriodo(periodoInicial);
 
         } catch (error) {
           console.error('Error al cargar las secciones', error);
@@ -215,7 +218,7 @@ const InformeAsistencia = () => {
             identificacion: dato.Est_Identificacion,
             nombre: `${dato.Est_Nombre} ${dato.Est_PrimerApellido} ${dato.Est_SegundoApellido}`,
             materias: new Map(),
-            total_porcentaje: 0,
+           // total_porcentaje: 0,
           });
         }
 
@@ -226,10 +229,12 @@ const InformeAsistencia = () => {
             materia: dato.Materia,
             porcentaje_asistencia: asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0,
             evaluaciones: [],
+            total_porcentaje: 0,
           });
       
           // Sumar asistencia solo una vez por materia
-          estudiante.total_porcentaje += asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0;
+          estudiante.materias.get(dato.Materia).total_porcentaje = asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0;
+          //estudiante.total_porcentaje += asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0;
         }
       
         estudiante.materias.get(dato.Materia).evaluaciones.push({
@@ -240,7 +245,9 @@ const InformeAsistencia = () => {
           puntos_obtenidos: dato.Puntos_Obtenidos,
           nota: dato.Nota_Final,
           });
-          estudiante.total_porcentaje += dato.Porcentaje_Obtenido;
+        // Sumar el porcentaje obtenido a la materia
+        estudiante.materias.get(dato.Materia).total_porcentaje += dato.Porcentaje_Obtenido;
+          //estudiante.total_porcentaje += dato.Porcentaje_Obtenido;
         });
 
       const datosInforme = {
@@ -279,7 +286,7 @@ const InformeAsistencia = () => {
         identificacion: informe[0].Est_Identificacion,
         nombre: `${informe[0].Est_Nombre} ${informe[0].Est_PrimerApellido} ${informe[0].Est_SegundoApellido}`,
         materias: new Map(),
-        total_porcentaje: 0,
+        //total_porcentaje: 0,
       };
     
       informe.forEach((dato) => {
@@ -288,10 +295,12 @@ const InformeAsistencia = () => {
             materia: dato.Materia,
             porcentaje_asistencia: asistenciaPorMateria.get(dato.Materia) || 0,
             evaluaciones: [],
+            total_porcentaje: 0,
           });
+          // Sumar asistencia solo una vez por materia
+          estudiante.materias.get(dato.Materia).total_porcentaje = asistenciaPorMateria.get(dato.Materia) || 0;
     
-        
-          estudiante.total_porcentaje += asistenciaPorMateria.get(dato.Materia) || 0;
+          //estudiante.total_porcentaje += asistenciaPorMateria.get(dato.Materia) || 0;
         }
     
       
@@ -303,11 +312,11 @@ const InformeAsistencia = () => {
           puntos_obtenidos: dato.Puntos_Obtenidos,
           nota: dato.Nota_Final,
         });
-    
-  
-        estudiante.total_porcentaje += dato.Porcentaje_Obtenido;
+        // Sumar el porcentaje obtenido a la materia
+        estudiante.materias.get(dato.Materia).total_porcentaje += dato.Porcentaje_Obtenido;
+        //estudiante.total_porcentaje += dato.Porcentaje_Obtenido;
+        
       });
-    
     
       const datosInforme = {
         fechaHoy: new Date().toISOString().split("T")[0],
@@ -317,12 +326,104 @@ const InformeAsistencia = () => {
         institucion: institucion.Inst_Nombre,
         profesor: `${jwtDecode(cookies.get("token")).profesor}`,
         materias: Array.from(estudiante.materias.values()),
-        total_porcentaje: estudiante.total_porcentaje.toFixed(2), 
+        //total_porcentaje: estudiante.total_porcentaje.toFixed(2), 
       };
 
       GenerarDocumento('REPORTENOTASINDIVIDUAL.docx', datosInforme, `Reporte de notas individual - ${estudiante.nombre} - ${secciones.find((seccion) => seccion.value === selectedSeccion).label}`);
     }
+    if(selectedReportType === 'InformeConcentrados'){
 
+      const datosInformePorSeccion = [];
+
+      for (const seccion of secciones) {
+        const selectedSeccion = seccion.value;
+
+        const informe = await GetInformeNotasSeccion(selectedSeccion, periodoId);
+        const totalAsistencia = await GetAsistenciaTotalSeccion(selectedSeccion, periodoId);
+
+        const estudiantesMap = new Map();
+        const asistenciaPorEstudianteMateria = new Map();
+
+        totalAsistencia.forEach((dato) => {
+          const totalClases = dato.Total_Presente + dato.Total_Ausente + dato.Total_Ausente_Justificado;
+          const porcentajeAusencias = totalClases > 0 ? (dato.Total_Ausente / totalClases) * 100 : 0;
+          const porcentajeAsistencia = tablaMEP.find(rango => porcentajeAusencias >= rango.min && porcentajeAusencias < rango.max)?.asistencia || 0;
+
+          if (!asistenciaPorEstudianteMateria.has(dato.Est_Identificacion)) {
+              asistenciaPorEstudianteMateria.set(dato.Est_Identificacion, new Map());
+          }
+          asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).set(dato.Mat_Nombre, porcentajeAsistencia);
+        });
+
+        informe.forEach((dato) => {
+          if (!estudiantesMap.has(dato.Est_Identificacion)) {
+            estudiantesMap.set(dato.Est_Identificacion, {
+              identificacion: dato.Est_Identificacion,
+              nombre: dato.Est_Nombre,
+              primerApellido: dato.Est_PrimerApellido,
+              segundoApellido: dato.Est_SegundoApellido,
+              materias: new Map(),
+            });
+          }
+
+          const estudiante = estudiantesMap.get(dato.Est_Identificacion);
+
+          if (!estudiante.materias.has(dato.Materia)) {
+            estudiante.materias.set(dato.Materia, {
+              materia: dato.Materia,
+              porcentaje_asistencia: asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0,
+              evaluaciones: [],
+              total_porcentaje: 0,
+              condicion: '',
+            });
+
+            estudiante.materias.get(dato.Materia).total_porcentaje = asistenciaPorEstudianteMateria.get(dato.Est_Identificacion).get(dato.Materia) || 0;
+          }
+
+          estudiante.materias.get(dato.Materia).evaluaciones.push({});
+          estudiante.materias.get(dato.Materia).total_porcentaje += dato.Porcentaje_Obtenido;
+          estudiante.materias.get(dato.Materia).condicion = estudiante.materias.get(dato.Materia).total_porcentaje >= 65 ? 'Aprobado' : 'Reprobado';
+        });
+
+        const materiasMap = new Map();
+
+        estudiantesMap.forEach(estudiante => {
+          estudiante.materias.forEach(materia => {
+            if (!materiasMap.has(materia.materia)) {
+              materiasMap.set(materia.materia, []);
+            }
+
+            materiasMap.get(materia.materia).push({
+              primerApellido: estudiante.primerApellido,
+              segundoApellido: estudiante.segundoApellido,
+              nombre: estudiante.nombre,
+              identificacion: estudiante.identificacion,
+              total_porcentaje: materia.total_porcentaje,
+              condicion: materia.condicion,
+            });
+          });
+        });
+
+        datosInformePorSeccion.push({
+          año: new Date().getFullYear(),
+          seccion: seccion.label,
+          docente: `${jwtDecode(cookies.get("token")).profesor}`,
+          periodo: periodo.Per_Nombre,
+          materias: Array.from(materiasMap.entries()).map(([materia, estudiantes]) => ({
+            materia,
+            estudiantes
+          })),
+        });
+    
+    };
+
+      const datosInforme = {
+          institucion: institucion.Inst_Nombre,
+          secciones: datosInformePorSeccion,
+      };
+
+      GenerarDocumento('CONCENTRADOS.docx', datosInforme, `Reporte concentrado - ${institucion.Inst_Nombre}`);
+    }
 
   };
 
@@ -344,6 +445,7 @@ const InformeAsistencia = () => {
               { label: 'Informe de Asistencia Individual', value: 'InformeAsistenciaIndividual' },
               { label: 'Informe de Notas Grupal', value: 'InformeNotasGrupal' },
               { label: 'Informe de Notas Individual', value: 'InformeNotasIndividual' },
+              { label: 'Informe de Concentrados', value: 'InformeConcentrados' },
             ]}
             onChange={(e) => setSelectedReportType(e.value)}
             placeholder="Seleccione tipo de informe"
@@ -351,7 +453,7 @@ const InformeAsistencia = () => {
           />
         </div>
       </div>
-      {selectedReportType && (
+      {(selectedReportType === 'InformeAsistenciaIndividual' || selectedReportType === 'InformeNotasIndividual' || selectedReportType === 'InformeNotasGrupal' || selectedReportType === 'InformeAsistenciaGrupal') && (
         <div style={{ display: "flex", gap: "16px", marginBottom: "16px" }}>
         <div style={{ flex: 1 }}> 
           <Dropdown 
