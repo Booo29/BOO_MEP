@@ -37,7 +37,7 @@ const CrearIndicadoresyNiveles = () => {
         GetNivelesDesempeno().then(setNivelesDesempeno);
         if (evaluacionId) {
             GetEvaluacionIndicadoresNivelesById(evaluacionId).then((response) => {
-                if (response && Array.isArray(response[0].indicadores)) {
+                if (response && response[0].indicadores.length > 0 && Array.isArray(response[0].indicadores)) {
                     const updatedTableData = response[0].indicadores.map(indicador => ({
                         Ind_Id: indicador.id,
                         Ind_Nombre: indicador.nombre,
@@ -51,15 +51,16 @@ const CrearIndicadoresyNiveles = () => {
                         ).join('\n'),
                         isExisting: true
                     }));
+
                     setSelectedIndicadores(response[0].indicadores.map(ind => ({
                         Ind_Id: ind.id,
                         Ind_Nombre: ind.nombre
                     })));
-    
                     setTableData(updatedTableData);
                     setIsEditMode(true);
                 } else {
-                    console.error('No vienen indicadores en el response:', response);
+                    
+                    setIsEditMode(false);
                 }
             });
         }
@@ -176,10 +177,12 @@ const CrearIndicadoresyNiveles = () => {
             if (!isEditMode) {
                 setTableData([]);
                 setSelectedIndicadores([]);
+                console.log('Indicadores y niveles guardados correctamente');
             } else {
                 // Si estás en edición, marca como no nuevo después de guardar
                 const updatedTable = tableData.map(row => ({ ...row, isNew: false }));
                 setTableData(updatedTable);
+                console.log('Indicadores y niveles guardados y editados correctamente');
             }
         });
         

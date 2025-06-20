@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CrearEvaluacion from './CrearEvaluacion';
 import CrearIndicadoresyNiveles from './CrearIndicadoresyNiveles';
-
+import useEvaluacionStore from '../../store/EvaluacionStore';
 
 const EvaluacionesStepForm = () => {
 
@@ -13,10 +13,14 @@ const EvaluacionesStepForm = () => {
 
   const [activeStep, setActiveStep] = useState(0);
 
+  const setEvaluacionId = useEvaluacionStore((state) => state.setEvaluacionId);
+
 
   const handleNext = () => {
     if(activeStep  === steps.length - 1){
       navigate('/EvaluacionesPage');
+      setEvaluacionId(null); // Reset evaluacionId after finishing the steps
+
     }
     else{
       setActiveStep((prevStep) => prevStep + 1);

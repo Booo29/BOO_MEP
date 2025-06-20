@@ -107,9 +107,8 @@ const CrearEvaluacion = () => {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         setEvaluacionId(evaluacionId);
+                        
                     } else {
-                        navigate('/EvaluacionesPage');
-                        //Limpiar los campos
                         setEvaluacion({
                             nombre: '',
                             puntos: '',
@@ -118,6 +117,8 @@ const CrearEvaluacion = () => {
                             indicadores: [],
                             nivelesDesempeno: []
                         });
+                        setEvaluacionId(null);
+                         navigate('/EvaluacionesPage');
                     }
                 });
             } catch (error) {
@@ -153,9 +154,9 @@ const CrearEvaluacion = () => {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         setEvaluacionId(response.insertedIds[0]);
+                        console.log('Evaluación creada con ID:', response.insertedIds[0]);
                     } else {
-                        navigate('/EvaluacionesPage');
-                        //Limpiar los campos
+                       
                         setEvaluacion({
                             nombre: '',
                             puntos: '',
@@ -164,6 +165,8 @@ const CrearEvaluacion = () => {
                             indicadores: [],
                             nivelesDesempeno: []
                         });
+
+                         navigate('/EvaluacionesPage');
                     }
                 });
             } catch (error) {
